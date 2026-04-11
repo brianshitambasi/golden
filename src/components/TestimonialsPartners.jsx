@@ -2,112 +2,195 @@
 const React = require('react');
 
 const TestimonialsPartners = () => {
-  return React.createElement('section', { id: 'testimonials', className: 'py-20 bg-gray-100' },
-    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' },
-      React.createElement('h2', { className: 'text-4xl md:text-5xl font-bold text-center mb-4' }, 
-        '⭐ TESTIMONIES ⭐'
+  const testimonials = [
+    {
+      name: 'DINNA NEKESA',
+      role: 'Trek Qualifier',
+      quote: 'Tamarind Trees — Resilience!',
+      image: 'https://randomuser.me/api/portraits/women/68.jpg',
+      achievement: 'Top Performer 2024'
+    },
+    {
+      name: 'LEADER SILAS OKOTH',
+      role: 'Leadership Award Winner',
+      quote: 'Excellent Leadership Award',
+      image: 'https://randomuser.me/api/portraits/men/75.jpg',
+      achievement: 'Gold Ambassador'
+    },
+    {
+      name: 'PAUL BARASA',
+      role: 'CEO Golden Dreamers',
+      quote: 'Building leaders that last',
+      image: 'https://randomuser.me/api/portraits/men/32.jpg',
+      achievement: 'Visionary Leader'
+    }
+  ];
+
+  const partners = [
+    { name: 'EcoBank', icon: 'fas fa-university', color: '#4A90E2', tag: 'The Pan African Bank' },
+    { name: 'Stanbic Bank', icon: 'fas fa-building', color: '#2C3E50', tag: 'A member of Standard Bank Group' },
+    { name: "Nature's Way", icon: 'fas fa-leaf', color: '#50C878', tag: 'Vegetarian V-CAPS' },
+    { name: 'DSM • Weider', icon: 'fas fa-flask', color: '#9B59B6', tag: 'resVida' }
+  ];
+
+  return React.createElement('section', { 
+    id: 'testimonials', 
+    className: 'py-5', 
+    style: { background: 'linear-gradient(135deg, #f8f9fa, #fff)' } 
+  },
+    React.createElement('div', { className: 'container' },
+      // Section Header
+      React.createElement('div', { className: 'text-center mb-5' },
+        React.createElement('span', { className: 'badge bg-warning text-dark px-4 py-2 rounded-pill mb-3' },
+          React.createElement('i', { className: 'fas fa-star me-2' }), ' SUCCESS STORIES'
+        ),
+        React.createElement('h2', { className: 'display-4 fw-bold mb-3' }, '⭐ TESTIMONIES ⭐'),
+        React.createElement('div', { className: 'gold-divider' }),
+        React.createElement('p', { className: 'text-muted fs-5' }, 'Success stories from Kenya & Gulf region')
       ),
-      React.createElement('p', { className: 'text-center text-gray-600 mb-12' }, 
-        'Success stories from Kenya & Gulf region'
-      ),
-      
+
       // Testimonials Grid
-      React.createElement('div', { className: 'grid md:grid-cols-3 gap-8' },
-        // Testimonial 1
-        React.createElement('div', { className: 'bg-white p-6 rounded-2xl shadow-lg text-center hover:shadow-xl transition-shadow' },
-          React.createElement('img', { 
-            src: 'https://randomuser.me/api/portraits/women/68.jpg', 
-            className: 'w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-yellow-400' 
-          }),
-          React.createElement('h3', { className: 'text-xl font-bold text-gray-800' }, 'DINNA NEKESA'),
-          React.createElement('p', { className: 'text-yellow-600 font-semibold' }, 'Trek Qualifier'),
-          React.createElement('p', { className: 'italic text-gray-600 mt-2' }, '"Tamarind Trees — Resilience!"'),
-          React.createElement('div', { className: 'flex justify-center mt-3 text-yellow-500' },
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' })
-          )
-        ),
-        
-        // Testimonial 2
-        React.createElement('div', { className: 'bg-white p-6 rounded-2xl shadow-lg text-center hover:shadow-xl transition-shadow' },
-          React.createElement('img', { 
-            src: 'https://randomuser.me/api/portraits/men/75.jpg', 
-            className: 'w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-yellow-400' 
-          }),
-          React.createElement('h3', { className: 'text-xl font-bold text-gray-800' }, 'LEADER SILAS OKOTH'),
-          React.createElement('p', { className: 'text-yellow-600 font-semibold' }, 'Leadership Award Winner'),
-          React.createElement('p', { className: 'italic text-gray-600 mt-2' }, '"Excellent Leadership Award"'),
-          React.createElement('div', { className: 'flex justify-center mt-3 text-yellow-500' },
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' })
-          )
-        ),
-        
-        // Testimonial 3
-        React.createElement('div', { className: 'bg-white p-6 rounded-2xl shadow-lg text-center hover:shadow-xl transition-shadow' },
-          React.createElement('img', { 
-            src: 'https://randomuser.me/api/portraits/men/32.jpg', 
-            className: 'w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-yellow-400' 
-          }),
-          React.createElement('h3', { className: 'text-xl font-bold text-gray-800' }, 'PAUL BARASA'),
-          React.createElement('p', { className: 'text-yellow-600 font-semibold' }, 'CEO Golden Dreamers'),
-          React.createElement('p', { className: 'italic text-gray-600 mt-2' }, '"Building leaders that last"'),
-          React.createElement('div', { className: 'flex justify-center mt-3 text-yellow-500' },
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' }),
-            React.createElement('i', { className: 'fas fa-star' })
+      React.createElement('div', { className: 'row justify-content-center g-4 mb-5' },
+        testimonials.map((testimonial, idx) =>
+          React.createElement('div', { key: idx, className: 'col-lg-4 col-md-6' },
+            React.createElement('div', { 
+              className: 'card h-100 border-0 rounded-4 shadow-lg overflow-hidden', 
+              style: { animationDelay: `${idx * 0.1}s` } 
+            },
+              // Quote Icon
+              React.createElement('div', { className: 'position-absolute top-0 start-0 p-3 opacity-25' },
+                React.createElement('i', { className: 'fas fa-quote-left fs-1 text-warning' })
+              ),
+              
+              React.createElement('div', { className: 'card-body text-center p-4' },
+                // Avatar
+                React.createElement('div', { className: 'position-relative d-inline-block mb-3' },
+                  React.createElement('img', { 
+                    src: testimonial.image, 
+                    alt: testimonial.name,
+                    className: 'rounded-circle border-4 border-warning shadow-lg',
+                    style: { width: '100px', height: '100px', objectFit: 'cover' }
+                  }),
+                  React.createElement('div', { className: 'position-absolute bottom-0 end-0 bg-success rounded-circle p-1 border-2 border-white' },
+                    React.createElement('i', { className: 'fas fa-check-circle text-white small' })
+                  )
+                ),
+
+                // Rating Stars
+                React.createElement('div', { className: 'mb-2' },
+                  Array(5).fill().map((_, i) =>
+                    React.createElement('i', { key: i, className: 'fas fa-star text-warning mx-0' })
+                  )
+                ),
+
+                // Quote
+                React.createElement('p', { className: 'fs-5 fst-italic text-muted mb-3' }, `"${testimonial.quote}"`),
+
+                // Name & Role
+                React.createElement('h4', { className: 'fw-bold mb-1' }, testimonial.name),
+                React.createElement('p', { className: 'text-warning fw-semibold mb-2' }, testimonial.role),
+                
+                // Achievement Badge
+                React.createElement('span', { className: 'd-inline-block bg-warning bg-opacity-10 px-3 py-1 rounded-pill small' },
+                  React.createElement('i', { className: 'fas fa-trophy me-1' }), ' ', testimonial.achievement
+                )
+              )
+            )
           )
         )
       ),
-      
+
       // Partners Section
-      React.createElement('div', { className: 'mt-16 bg-white p-8 rounded-2xl shadow-lg' },
-        React.createElement('h3', { className: 'text-2xl font-bold text-center mb-6' }, '🤝 OUR PARTNERS'),
-        React.createElement('div', { className: 'flex flex-wrap justify-center gap-8 items-center' },
-          React.createElement('div', { className: 'text-center' },
-            React.createElement('i', { className: 'fas fa-university text-3xl text-blue-700' }),
-            React.createElement('p', { className: 'font-semibold mt-1' }, 'EcoBank'),
-            React.createElement('p', { className: 'text-xs text-gray-500' }, 'The Pan African Bank')
-          ),
-          React.createElement('div', { className: 'text-center' },
-            React.createElement('i', { className: 'fas fa-building text-3xl text-blue-600' }),
-            React.createElement('p', { className: 'font-semibold mt-1' }, 'Stanbic Bank'),
-            React.createElement('p', { className: 'text-xs text-gray-500' }, 'A member of Standard Bank Group')
-          ),
-          React.createElement('div', { className: 'text-center' },
-            React.createElement('i', { className: 'fas fa-leaf text-3xl text-green-600' }),
-            React.createElement('p', { className: 'font-semibold mt-1' }, "Nature's Way"),
-            React.createElement('p', { className: 'text-xs text-gray-500' }, 'Vegetarian V-CAPS')
-          ),
-          React.createElement('div', { className: 'text-center' },
-            React.createElement('i', { className: 'fas fa-flask text-3xl text-purple-600' }),
-            React.createElement('p', { className: 'font-semibold mt-1' }, 'DSM • Weider'),
-            React.createElement('p', { className: 'text-xs text-gray-500' }, 'resVida')
+      React.createElement('div', { className: 'text-center mt-5 mb-4' },
+        React.createElement('span', { className: 'badge bg-warning text-dark px-4 py-2 rounded-pill mb-3' },
+          React.createElement('i', { className: 'fas fa-handshake me-2' }), ' TRUSTED BY'
+        ),
+        React.createElement('h3', { className: 'display-5 fw-bold mb-3' }, '🤝 OUR PARTNERS'),
+        React.createElement('div', { className: 'gold-divider' })
+      ),
+
+      React.createElement('div', { className: 'row justify-content-center g-4 mb-5' },
+        partners.map((partner, idx) =>
+          React.createElement('div', { key: idx, className: 'col-lg-3 col-md-6' },
+            React.createElement('div', { 
+              className: 'text-center p-4 rounded-4 shadow-sm bg-white', 
+              style: { transition: 'all 0.3s ease' },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.1)';
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.075)';
+              }
+            },
+              React.createElement('div', { 
+                className: 'd-inline-flex align-items-center justify-content-center rounded-circle p-3 mb-3',
+                style: { 
+                  background: `linear-gradient(135deg, ${partner.color}20, ${partner.color}10)`,
+                  width: '80px',
+                  height: '80px'
+                }
+              },
+                React.createElement('i', { className: `${partner.icon} fs-1`, style: { color: partner.color } })
+              ),
+              React.createElement('h5', { className: 'fw-bold mb-1' }, partner.name),
+              React.createElement('p', { className: 'text-muted small mb-0' }, partner.tag)
+            )
           )
         )
       ),
-      
+
       // Leadership Award Section
-      React.createElement('div', { className: 'mt-10 text-center bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-xl' },
-        React.createElement('i', { className: 'fas fa-trophy text-4xl text-yellow-600 mb-2' }),
-        React.createElement('p', { className: 'text-2xl font-bold text-gray-800' }, '🏆 EXCELLENT LEADERSHIP AWARD'),
-        React.createElement('p', { className: 'text-xl text-gray-800 mt-2' }, 'PAUL BARASA — Congratulations for this achievement!'),
-        React.createElement('a', { 
-          href: '#', 
-          className: 'text-yellow-700 text-sm mt-2 inline-block hover:underline' 
-        }, 'www.betawayoutlifeproject.com')
+      React.createElement('div', { className: 'row justify-content-center mt-4' },
+        React.createElement('div', { className: 'col-lg-10' },
+          React.createElement('div', { 
+            className: 'text-center p-5 rounded-4', 
+            style: { 
+              background: 'linear-gradient(135deg, #FFF8E7, #FFF3E0)',
+              border: '2px solid rgba(212, 175, 55, 0.3)',
+              position: 'relative',
+              overflow: 'hidden'
+            } 
+          },
+            // Decorative background
+            React.createElement('div', { className: 'position-absolute top-0 start-0 w-100 h-100', style: { opacity: 0.05 } },
+              React.createElement('i', { className: 'fas fa-trophy position-absolute top-0 start-0 fs-1 m-3' }),
+              React.createElement('i', { className: 'fas fa-trophy position-absolute bottom-0 end-0 fs-1 m-3' })
+            ),
+            
+            React.createElement('div', { className: 'position-relative' },
+              React.createElement('div', { 
+                className: 'd-inline-block p-3 rounded-circle bg-warning mb-3', 
+                style: { boxShadow: '0 0 20px rgba(212,175,55,0.5)' } 
+              },
+                React.createElement('i', { className: 'fas fa-trophy display-4 text-white' })
+              ),
+              React.createElement('h2', { className: 'display-5 fw-bold mb-2' }, '🏆 EXCELLENT LEADERSHIP AWARD'),
+              React.createElement('p', { className: 'fs-3 fw-semibold text-warning mb-2' }, 'PAUL BARASA'),
+              React.createElement('p', { className: 'fs-5 text-dark mb-3' }, 'Congratulations for this achievement!'),
+              React.createElement('a', { 
+                href: '#', 
+                className: 'btn btn-outline-warning rounded-pill px-4 py-2 fw-semibold',
+                style: { transition: 'all 0.3s ease' },
+                onMouseEnter: (e) => {
+                  e.target.style.background = 'linear-gradient(135deg, #D4AF37, #B8860B)';
+                  e.target.style.color = 'white';
+                },
+                onMouseLeave: (e) => {
+                  e.target.style.background = 'transparent';
+                  e.target.style.color = '#B8860B';
+                }
+              },
+                React.createElement('i', { className: 'fas fa-external-link-alt me-2' }),
+                'www.betawayoutlifeproject.com'
+              )
+            )
+          )
+        )
       )
     )
   );
 };
 
-// IMPORTANT: Make sure this is the correct export
 module.exports = TestimonialsPartners;
