@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavigationBar from './components/Navbar';
 import HomeComponent from './components/HomeComponent';
@@ -14,6 +14,30 @@ import Footer from './components/Footer';
 import './App.css';
 
 function App() {
+  // Add mobile dropdown functionality
+  useEffect(() => {
+    const handleDropdownClick = (e) => {
+      const header = e.target.closest('.dropdown-mobile-header');
+      if (header) {
+        const content = header.nextElementSibling;
+        const allContents = document.querySelectorAll('.dropdown-mobile-content');
+        allContents.forEach(c => {
+          if (c !== content) {
+            c.classList.remove('show');
+          }
+        });
+        content.classList.toggle('show');
+        header.classList.toggle('active');
+      }
+    };
+
+    document.addEventListener('click', handleDropdownClick);
+    
+    return () => {
+      document.removeEventListener('click', handleDropdownClick);
+    };
+  }, []);
+
   return (
     <Router>
       <div className="App">
