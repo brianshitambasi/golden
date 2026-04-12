@@ -106,7 +106,7 @@ const NavBar = () => {
               );
             })}
 
-            {/* Business Dropdown */}
+            {/* Business Dropdown - Mobile friendly */}
             <NavDropdown
               title={
                 <span>
@@ -115,8 +115,10 @@ const NavBar = () => {
                 </span>
               }
               id="business-dropdown"
-              className="nav-dropdown-custom"
+              className="nav-dropdown-custom w-100"
               menuVariant="light"
+              // Ensure dropdown renders properly on mobile
+              renderMenuOnMount={true}
             >
               {businessDropdown.map((item, idx) => (
                 <NavDropdown.Item
@@ -183,12 +185,12 @@ const NavBar = () => {
               boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.4)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
             }}
           >
             <i className="fas fa-user-plus me-2"></i>
@@ -197,7 +199,7 @@ const NavBar = () => {
         </BootstrapNavbar.Collapse>
       </Container>
 
-      <style jsx>{`
+      <style>{`
         .navbar-custom {
           transition: all 0.3s ease;
         }
@@ -257,17 +259,61 @@ const NavBar = () => {
           border-radius: 3px;
         }
         
+        /* Mobile dropdown styles */
         .nav-dropdown-custom .dropdown-toggle {
           font-weight: 600;
           color: #4a5568;
           transition: all 0.3s ease;
           padding: 8px 16px;
           border-radius: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
         }
         
         .nav-dropdown-custom .dropdown-toggle:hover {
           color: #D4AF37 !important;
           background-color: rgba(212, 175, 55, 0.1) !important;
+        }
+        
+        /* Ensure dropdown menu is visible on mobile */
+        .nav-dropdown-custom .dropdown-menu {
+          position: static !important;
+          transform: none !important;
+          width: 100%;
+          margin-top: 0.5rem;
+          border: none;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+          border-radius: 12px;
+          padding: 0.5rem 0;
+        }
+        
+        /* Override Bootstrap's mobile dropdown behavior */
+        @media (max-width: 991.98px) {
+          .nav-dropdown-custom .dropdown-menu {
+            position: static !important;
+            transform: none !important;
+            width: 100%;
+            background-color: #f8f9fa;
+            margin-top: 0;
+            box-shadow: none;
+            border-radius: 8px;
+          }
+          
+          .nav-dropdown-custom.show .dropdown-menu {
+            display: block;
+          }
+        }
+        
+        /* Desktop dropdown styles */
+        @media (min-width: 992px) {
+          .nav-dropdown-custom .dropdown-menu {
+            position: absolute;
+            transform: translateX(-20%) !important;
+            min-width: 280px;
+            margin-top: 0.5rem;
+          }
         }
         
         .dropdown-item-custom {
@@ -316,27 +362,42 @@ const NavBar = () => {
         @media (max-width: 992px) {
           .navbar-nav {
             margin-top: 20px;
+            width: 100%;
           }
           
           .nav-link-custom {
             text-align: center;
             margin: 5px 0;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+          }
+          
+          .nav-dropdown-custom {
+            width: 100%;
+            text-align: center;
           }
           
           .nav-dropdown-custom .dropdown-toggle {
             text-align: center;
+            justify-content: center;
             width: 100%;
           }
           
           .dropdown-menu {
             width: 100%;
-            text-align: center;
+            text-align: left;
           }
           
           .btn-join {
             width: 100%;
             margin-top: 15px;
             margin-bottom: 10px;
+          }
+          
+          /* Adjust active indicator for mobile */
+          .nav-link-custom.active::after {
+            bottom: -2px;
           }
         }
       `}</style>
