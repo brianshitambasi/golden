@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar as BootstrapNavbar, Nav, Container, Button, NavDropdown } from 'react-bootstrap';
+import { Navbar as BootstrapNavbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const location = useLocation();
   const [activeLink, setActiveLink] = useState('/');
 
@@ -31,10 +32,14 @@ const NavBar = () => {
   ];
 
   const businessDropdown = [
-    { path: '/board', label: 'Board of Directors', icon: 'fas fa-users', description: 'Meet our leadership team' },
-    { path: '/compensation', label: 'Compensation Plan', icon: 'fas fa-chart-line', description: 'View our earning structure' },
-    { path: '/packages', label: 'Startup Packages', icon: 'fas fa-gem', description: 'Choose your investment plan' },
+    { path: '/board', label: 'Board of Directors', icon: 'fas fa-users', description: 'Meet our leadership team', color: '#4A90E2' },
+    { path: '/compensation', label: 'Compensation Plan', icon: 'fas fa-chart-line', description: 'View our earning structure', color: '#50C878' },
+    { path: '/packages', label: 'Startup Packages', icon: 'fas fa-gem', description: 'Choose your investment plan', color: '#D4AF37' },
   ];
+
+  const toggleMobileDropdown = () => {
+    setMobileDropdownOpen(!mobileDropdownOpen);
+  };
 
   return (
     <BootstrapNavbar 
@@ -106,91 +111,199 @@ const NavBar = () => {
               );
             })}
 
-            {/* Business Dropdown - Mobile Friendly */}
+            {/* Mobile Dropdown - With Visible Icons */}
             <div className="nav-dropdown-wrapper w-100 d-lg-none">
-              <div className="dropdown-mobile-header" onClick={() => {
-                const dropdown = document.getElementById('mobile-business-dropdown');
-                if (dropdown) {
-                  dropdown.classList.toggle('show');
-                }
-              }}>
-                <i className="fas fa-chart-line me-2"></i>
-                Business
-                <i className="fas fa-chevron-down ms-auto"></i>
+              <div 
+                className="dropdown-mobile-header" 
+                onClick={toggleMobileDropdown}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  background: mobileDropdownOpen ? 'rgba(212, 175, 55, 0.1)' : 'white',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid #e0e0e0',
+                  marginBottom: mobileDropdownOpen ? '0' : '0'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    background: 'linear-gradient(135deg, #D4AF37, #B8860B)',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <i className="fas fa-chart-line text-white fs-5"></i>
+                  </div>
+                  <span style={{ fontWeight: 'bold', fontSize: '16px', color: '#333' }}>Business Menu</span>
+                </div>
+                <i className={`fas fa-chevron-${mobileDropdownOpen ? 'up' : 'down'} text-warning fs-5`}></i>
               </div>
-              <div id="mobile-business-dropdown" className="dropdown-mobile-content">
-                {businessDropdown.map((item, idx) => (
+              
+              {mobileDropdownOpen && (
+                <div className="dropdown-mobile-content" style={{
+                  marginTop: '8px',
+                  background: '#f8f9fa',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  border: '1px solid #e0e0e0',
+                  animation: 'slideDown 0.3s ease'
+                }}>
+                  {businessDropdown.map((item, idx) => (
+                    <Link
+                      key={idx}
+                      to={item.path}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setMobileDropdownOpen(false);
+                      }}
+                      className="dropdown-mobile-item"
+                      style={{
+                        display: 'block',
+                        padding: '16px',
+                        textDecoration: 'none',
+                        transition: 'all 0.3s ease',
+                        borderBottom: idx < businessDropdown.length - 1 ? '1px solid #e0e0e0' : 'none',
+                        background: 'white'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)';
+                        e.currentTarget.style.transform = 'translateX(5px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'white';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }}
+                    >
+                      <div className="d-flex align-items-center" style={{ gap: '15px' }}>
+                        <div className="dropdown-icon" style={{
+                          width: '50px',
+                          height: '50px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: `linear-gradient(135deg, ${item.color}, ${item.color}cc)`,
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                        }}>
+                          <i className={`${item.icon} text-white fs-4`}></i>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div className="fw-bold" style={{ fontSize: '16px', color: '#333', marginBottom: '4px' }}>
+                            {item.label}
+                          </div>
+                          <small className="text-muted" style={{ fontSize: '12px', display: 'block' }}>
+                            {item.description}
+                          </small>
+                        </div>
+                        <i className="fas fa-chevron-right text-warning"></i>
+                      </div>
+                    </Link>
+                  ))}
+                  <div className="dropdown-divider" style={{ height: '1px', background: '#e0e0e0' }}></div>
                   <Link
-                    key={idx}
-                    to={item.path}
-                    onClick={() => setIsOpen(false)}
+                    to="/compensation"
+                    onClick={() => {
+                      setIsOpen(false);
+                      setMobileDropdownOpen(false);
+                    }}
                     className="dropdown-mobile-item"
+                    style={{
+                      display: 'block',
+                      padding: '16px',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                      background: 'linear-gradient(135deg, #FFF8E7, #FFF3E0)',
+                      fontWeight: 'bold',
+                      color: '#D4AF37'
+                    }}
                   >
-                    <div className="d-flex align-items-center">
-                      <div className="dropdown-icon me-3">
-                        <i className={`${item.icon} text-warning`}></i>
-                      </div>
-                      <div>
-                        <div className="fw-semibold">{item.label}</div>
-                        <small className="text-muted">{item.description}</small>
-                      </div>
-                    </div>
+                    <i className="fas fa-calculator me-2"></i>
+                    Calculate Your Earnings
+                    <i className="fas fa-arrow-right ms-2"></i>
                   </Link>
-                ))}
-                <div className="dropdown-divider"></div>
-                <Link
-                  to="/compensation"
-                  onClick={() => setIsOpen(false)}
-                  className="dropdown-mobile-item text-center"
-                >
-                  <i className="fas fa-calculator me-2"></i>
-                  Calculate Your Earnings
-                </Link>
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Desktop Dropdown */}
-            <NavDropdown
-              title={
-                <span>
+            <div className="nav-dropdown-custom d-none d-lg-block">
+              <div className="dropdown">
+                <button 
+                  className="dropdown-toggle-custom"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '8px 16px',
+                    fontWeight: '600',
+                    color: '#4a5568',
+                    borderRadius: '50px',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
                   <i className="fas fa-chart-line me-2"></i>
                   Business
-                </span>
-              }
-              id="business-dropdown"
-              className="nav-dropdown-custom d-none d-lg-block"
-              menuVariant="light"
-            >
-              {businessDropdown.map((item, idx) => (
-                <NavDropdown.Item
-                  key={idx}
-                  as={Link}
-                  to={item.path}
-                  onClick={() => setIsOpen(false)}
-                  className="dropdown-item-custom"
-                >
-                  <div className="d-flex align-items-center">
-                    <div className="dropdown-icon me-3">
-                      <i className={`${item.icon} text-warning`}></i>
-                    </div>
-                    <div>
-                      <div className="fw-semibold">{item.label}</div>
-                      <small className="text-muted">{item.description}</small>
-                    </div>
-                  </div>
-                </NavDropdown.Item>
-              ))}
-              <NavDropdown.Divider />
-              <NavDropdown.Item 
-                as={Link}
-                to="/compensation"
-                onClick={() => setIsOpen(false)}
-                className="dropdown-item-custom text-center"
-              >
-                <i className="fas fa-calculator me-2"></i>
-                Calculate Your Earnings
-              </NavDropdown.Item>
-            </NavDropdown>
+                </button>
+                <div className="dropdown-menu-custom">
+                  {businessDropdown.map((item, idx) => (
+                    <Link
+                      key={idx}
+                      to={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className="dropdown-item-custom"
+                      style={{
+                        display: 'block',
+                        padding: '12px 20px',
+                        textDecoration: 'none',
+                        color: '#4a5568',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <div className="d-flex align-items-center">
+                        <div className="dropdown-icon me-3" style={{
+                          width: '40px',
+                          height: '40px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: `rgba(212, 175, 55, 0.1)`,
+                          borderRadius: '10px'
+                        }}>
+                          <i className={`${item.icon} text-warning fs-5`}></i>
+                        </div>
+                        <div>
+                          <div className="fw-semibold">{item.label}</div>
+                          <small className="text-muted">{item.description}</small>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                  <div style={{ height: '1px', background: '#e0e0e0', margin: '8px 0' }}></div>
+                  <Link
+                    to="/compensation"
+                    onClick={() => setIsOpen(false)}
+                    className="dropdown-item-custom text-center"
+                    style={{
+                      display: 'block',
+                      padding: '12px 20px',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      color: '#D4AF37'
+                    }}
+                  >
+                    <i className="fas fa-calculator me-2"></i>
+                    Calculate Your Earnings
+                  </Link>
+                </div>
+              </div>
+            </div>
 
             {/* Contact Link */}
             <Nav.Link
@@ -219,7 +332,7 @@ const NavBar = () => {
               background: 'linear-gradient(135deg, #D4AF37, #B8860B)',
               border: 'none',
               borderRadius: '50px',
-              padding: '10px 28px',
+              padding: '12px 28px',
               fontWeight: 'bold',
               color: 'white',
               transition: 'all 0.3s ease',
@@ -301,142 +414,65 @@ const NavBar = () => {
           border-radius: 3px;
         }
         
-        /* Mobile Dropdown Styles */
-        .nav-dropdown-wrapper {
-          margin: 5px 0;
-          border-radius: 12px;
-          background: white;
-          border: 1px solid #e0e0e0;
+        /* Desktop Dropdown Styles */
+        .dropdown {
+          position: relative;
+          display: inline-block;
         }
         
-        .dropdown-mobile-header {
-          padding: 12px 16px;
-          display: flex;
-          align-items: center;
-          font-weight: 600;
-          color: #4a5568;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 12px;
-        }
-        
-        .dropdown-mobile-header:hover {
-          background-color: rgba(212, 175, 55, 0.1);
-          color: #D4AF37;
-        }
-        
-        .dropdown-mobile-header i:first-child {
-          margin-right: 12px;
-        }
-        
-        .dropdown-mobile-header i:last-child {
-          margin-left: auto;
-          transition: transform 0.3s ease;
-        }
-        
-        .dropdown-mobile-header.active i:last-child {
-          transform: rotate(180deg);
-        }
-        
-        .dropdown-mobile-content {
-          display: none;
-          padding: 8px 0;
-          border-top: 1px solid #e0e0e0;
-          background: #f8f9fa;
-          border-radius: 0 0 12px 12px;
-        }
-        
-        .dropdown-mobile-content.show {
-          display: block;
-        }
-        
-        .dropdown-mobile-item {
-          padding: 12px 16px;
-          display: block;
-          text-decoration: none;
-          color: #4a5568;
-          transition: all 0.3s ease;
+        .dropdown-toggle-custom {
           cursor: pointer;
         }
         
-        .dropdown-mobile-item:hover {
-          background-color: rgba(212, 175, 55, 0.1);
-          transform: translateX(5px);
-          text-decoration: none;
-          color: #4a5568;
-        }
-        
-        .dropdown-divider {
-          height: 1px;
-          background: #e0e0e0;
-          margin: 8px 0;
-        }
-        
-        /* Desktop dropdown styles */
-        .nav-dropdown-custom .dropdown-toggle {
-          font-weight: 600;
-          color: #4a5568;
-          transition: all 0.3s ease;
-          padding: 8px 16px;
-          border-radius: 50px;
-        }
-        
-        .nav-dropdown-custom .dropdown-toggle:hover {
+        .dropdown-toggle-custom:hover {
           color: #D4AF37 !important;
           background-color: rgba(212, 175, 55, 0.1) !important;
         }
         
-        .nav-dropdown-custom .dropdown-menu {
+        .dropdown-menu-custom {
+          display: none;
           position: absolute;
-          transform: translateX(-20%) !important;
-          min-width: 280px;
-          margin-top: 0.5rem;
-          border: none;
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+          top: 100%;
+          left: 0;
+          min-width: 300px;
+          background: white;
           border-radius: 12px;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+          z-index: 1000;
+          margin-top: 8px;
+          overflow: hidden;
         }
         
-        .dropdown-item-custom {
-          padding: 10px 20px;
-          transition: all 0.3s ease;
+        .dropdown:hover .dropdown-menu-custom {
+          display: block;
+          animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         .dropdown-item-custom:hover {
           background-color: rgba(212, 175, 55, 0.1);
           transform: translateX(5px);
-        }
-        
-        .dropdown-icon {
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(212, 175, 55, 0.1);
-          border-radius: 8px;
-        }
-        
-        .btn-join {
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .btn-join::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 0;
-          height: 0;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.3);
-          transform: translate(-50%, -50%);
-          transition: width 0.6s, height 0.6s;
-        }
-        
-        .btn-join:hover::before {
-          width: 300px;
-          height: 300px;
         }
         
         @media (max-width: 992px) {
