@@ -4,33 +4,57 @@ const React = require('react');
 const TestimonialsPartners = () => {
   const testimonials = [
     {
-      name: 'DINNA NEKESA',
+      name: 'ERIC KIMATHI',
       role: 'Trek Qualifier',
       quote: 'Tamarind Trees — Resilience!',
-      image: 'https://randomuser.me/api/portraits/women/68.jpg',
+      image: '/images/static/IMG-20260406-WA0334.jpg',
       achievement: 'Top Performer 2024'
     },
     {
       name: 'LEADER SILAS OKOTH',
       role: 'Leadership Award Winner',
       quote: 'Excellent Leadership Award',
-      image: 'https://randomuser.me/api/portraits/men/75.jpg',
+      image: '/images/static/IMG-20260406-WA0924.jpg',
       achievement: 'Gold Ambassador'
     },
     {
       name: 'PAUL BARASA',
       role: 'CEO Golden Dreamers',
       quote: 'Building leaders that last',
-      image: 'https://randomuser.me/api/portraits/men/32.jpg',
+      image: '/images/static/IMG-20260406-WA0488.jpg',
       achievement: 'Visionary Leader'
     }
   ];
 
   const partners = [
-    { name: 'EcoBank', icon: 'fas fa-university', color: '#4A90E2', tag: 'The Pan African Bank' },
-    { name: 'Stanbic Bank', icon: 'fas fa-building', color: '#2C3E50', tag: 'A member of Standard Bank Group' },
-    { name: "Nature's Way", icon: 'fas fa-leaf', color: '#50C878', tag: 'Vegetarian V-CAPS' },
-    { name: 'DSM • Weider', icon: 'fas fa-flask', color: '#9B59B6', tag: 'resVida' }
+    { 
+      name: 'EcoBank', 
+      image: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Ecobank_logo.svg/200px-Ecobank_logo.svg.png',
+      tag: 'The Pan African Bank'
+    },
+    { 
+      name: 'Stanbic Bank', 
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Stanbic_Bank_logo.svg/200px-Stanbic_Bank_logo.svg.png',
+      tag: 'A member of Standard Bank Group'
+    },
+    { 
+      name: "Nature's Way", 
+      image: 'https://www.naturesway.com/on/demandware.static/-/Sites-NW-US-Library/default/dw5f8e3c8e/images/logo.png',
+      tag: 'Vegetarian V-CAPS',
+      fallbackImage: 'https://via.placeholder.com/150x80/4A90E2/white?text=Nature%27s+Way'
+    },
+    { 
+      name: 'WEIDER', 
+      image: 'https://www.weider.com/on/demandware.static/-/Sites-Weider-US-Library/default/dw8f3c5e6e/images/weider-logo.png',
+      tag: 'Global Fitness Brand',
+      fallbackImage: 'https://via.placeholder.com/150x80/9B59B6/white?text=WEIDER'
+    },
+    { 
+      name: 'DSM', 
+      image: 'https://www.dsm.com/content/dam/dsm/corporate/en_US/logos/dsm-logo-blue.svg',
+      tag: 'Science Based Nutrition',
+      fallbackImage: 'https://via.placeholder.com/150x80/9B59B6/white?text=DSM'
+    }
   ];
 
   return React.createElement('section', { 
@@ -51,11 +75,11 @@ const TestimonialsPartners = () => {
 
       // Testimonials Grid
       React.createElement('div', { className: 'row justify-content-center g-4 mb-5' },
-        testimonials.map((testimonial, idx) =>
-          React.createElement('div', { key: idx, className: 'col-lg-4 col-md-6' },
+        testimonials.map(function(testimonial, idx) {
+          return React.createElement('div', { key: idx, className: 'col-lg-4 col-md-6' },
             React.createElement('div', { 
               className: 'card h-100 border-0 rounded-4 shadow-lg overflow-hidden', 
-              style: { animationDelay: `${idx * 0.1}s` } 
+              style: { animationDelay: idx * 0.1 + 's' } 
             },
               // Quote Icon
               React.createElement('div', { className: 'position-absolute top-0 start-0 p-3 opacity-25' },
@@ -78,13 +102,13 @@ const TestimonialsPartners = () => {
 
                 // Rating Stars
                 React.createElement('div', { className: 'mb-2' },
-                  Array(5).fill().map((_, i) =>
-                    React.createElement('i', { key: i, className: 'fas fa-star text-warning mx-0' })
-                  )
+                  Array(5).fill().map(function(_, i) {
+                    return React.createElement('i', { key: i, className: 'fas fa-star text-warning mx-0' });
+                  })
                 ),
 
                 // Quote
-                React.createElement('p', { className: 'fs-5 fst-italic text-muted mb-3' }, `"${testimonial.quote}"`),
+                React.createElement('p', { className: 'fs-5 fst-italic text-muted mb-3' }, '"' + testimonial.quote + '"'),
 
                 // Name & Role
                 React.createElement('h4', { className: 'fw-bold mb-1' }, testimonial.name),
@@ -96,11 +120,11 @@ const TestimonialsPartners = () => {
                 )
               )
             )
-          )
-        )
+          );
+        })
       ),
 
-      // Partners Section
+      // Partners Section with Real Pictures
       React.createElement('div', { className: 'text-center mt-5 mb-4' },
         React.createElement('span', { className: 'badge bg-warning text-dark px-4 py-2 rounded-pill mb-3' },
           React.createElement('i', { className: 'fas fa-handshake me-2' }), ' TRUSTED BY'
@@ -110,35 +134,40 @@ const TestimonialsPartners = () => {
       ),
 
       React.createElement('div', { className: 'row justify-content-center g-4 mb-5' },
-        partners.map((partner, idx) =>
-          React.createElement('div', { key: idx, className: 'col-lg-3 col-md-6' },
+        partners.map(function(partner, idx) {
+          return React.createElement('div', { key: idx, className: 'col-lg-2 col-md-3 col-6' },
             React.createElement('div', { 
-              className: 'text-center p-4 rounded-4 shadow-sm bg-white', 
-              style: { transition: 'all 0.3s ease' },
-              onMouseEnter: (e) => {
+              className: 'text-center p-3 rounded-4 shadow-sm bg-white', 
+              style: { transition: 'all 0.3s ease', height: '150px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' },
+              onMouseEnter: function(e) {
                 e.currentTarget.style.transform = 'translateY(-5px)';
                 e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.1)';
               },
-              onMouseLeave: (e) => {
+              onMouseLeave: function(e) {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.075)';
               }
             },
+              // Partner Logo Image
               React.createElement('div', { 
-                className: 'd-inline-flex align-items-center justify-content-center rounded-circle p-3 mb-3',
-                style: { 
-                  background: `linear-gradient(135deg, ${partner.color}20, ${partner.color}10)`,
-                  width: '80px',
-                  height: '80px'
-                }
+                className: 'd-flex align-items-center justify-content-center mb-2',
+                style: { height: '70px', width: '100%' }
               },
-                React.createElement('i', { className: `${partner.icon} fs-1`, style: { color: partner.color } })
+                React.createElement('img', { 
+                  src: partner.image, 
+                  alt: partner.name,
+                  style: { maxWidth: '100%', maxHeight: '60px', objectFit: 'contain' },
+                  onError: function(e) {
+                    e.target.onerror = null;
+                    e.target.src = partner.fallbackImage || 'https://via.placeholder.com/120x60/D4AF37/white?text=' + partner.name;
+                  }
+                })
               ),
-              React.createElement('h5', { className: 'fw-bold mb-1' }, partner.name),
-              React.createElement('p', { className: 'text-muted small mb-0' }, partner.tag)
+              React.createElement('h6', { className: 'fw-bold mb-0', style: { fontSize: '0.9rem' } }, partner.name),
+              React.createElement('p', { className: 'text-muted small mb-0', style: { fontSize: '0.7rem' } }, partner.tag)
             )
-          )
-        )
+          );
+        })
       ),
 
       // Leadership Award Section
@@ -173,11 +202,11 @@ const TestimonialsPartners = () => {
                 href: '#', 
                 className: 'btn btn-outline-warning rounded-pill px-4 py-2 fw-semibold',
                 style: { transition: 'all 0.3s ease' },
-                onMouseEnter: (e) => {
+                onMouseEnter: function(e) {
                   e.target.style.background = 'linear-gradient(135deg, #D4AF37, #B8860B)';
                   e.target.style.color = 'white';
                 },
-                onMouseLeave: (e) => {
+                onMouseLeave: function(e) {
                   e.target.style.background = 'transparent';
                   e.target.style.color = '#B8860B';
                 }

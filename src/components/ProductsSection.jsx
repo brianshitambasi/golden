@@ -140,7 +140,7 @@ const ProductsSection = () => {
     // Energy-Chi Diffuser
     { 
       id: 11,
-      name: 'Energ-Chi Diffuser', 
+      name: 'Ener-Chi Diffuser', 
       category: 'wellness',
       dp: '1,700', 
       srp: '2,700', 
