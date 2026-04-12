@@ -77,10 +77,40 @@ const NavBar = () => {
           </div>
         </BootstrapNavbar.Brand>
 
-        {/* Mobile Toggle Button */}
+        {/* Mobile Toggle Button - Made visible */}
+        <div className="d-lg-none">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="mobile-menu-button"
+            style={{
+              background: 'linear-gradient(135deg, #D4AF37, #B8860B)',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '10px 14px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
+            }}
+          >
+            <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'} text-white fs-3`}></i>
+          </button>
+        </div>
+
+        {/* Desktop Toggle */}
         <BootstrapNavbar.Toggle 
           aria-controls="basic-navbar-nav"
-          className="border-0 shadow-none"
+          className="border-0 shadow-none d-none d-lg-flex"
         >
           <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'} fs-3 text-warning`}></i>
         </BootstrapNavbar.Toggle>
@@ -89,7 +119,7 @@ const NavBar = () => {
         <BootstrapNavbar.Collapse id="basic-navbar-nav">
           <Nav className="mx-auto d-flex gap-2 align-items-center w-100">
             {/* Main Navigation Links */}
-            {navLinks.map(link => {
+            {navLinks.map((link) => {
               const isActive = activeLink === link.path;
               return (
                 <Nav.Link
@@ -244,7 +274,8 @@ const NavBar = () => {
                     fontWeight: '600',
                     color: '#4a5568',
                     borderRadius: '50px',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
                   }}
                 >
                   <i className="fas fa-chart-line me-2"></i>
@@ -272,7 +303,7 @@ const NavBar = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          background: `rgba(212, 175, 55, 0.1)`,
+                          background: 'rgba(212, 175, 55, 0.1)',
                           borderRadius: '10px'
                         }}>
                           <i className={`${item.icon} text-warning fs-5`}></i>
@@ -354,7 +385,7 @@ const NavBar = () => {
         </BootstrapNavbar.Collapse>
       </Container>
 
-      <style>{`
+      <style jsx>{`
         .navbar-custom {
           transition: all 0.3s ease;
         }
@@ -473,6 +504,15 @@ const NavBar = () => {
         .dropdown-item-custom:hover {
           background-color: rgba(212, 175, 55, 0.1);
           transform: translateX(5px);
+        }
+        
+        /* Mobile menu button animation */
+        .mobile-menu-button {
+          transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-button:active {
+          transform: scale(0.95);
         }
         
         @media (max-width: 992px) {
