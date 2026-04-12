@@ -68,9 +68,6 @@ const PackagesSection = () => {
   const ContactModal = function() {
     if (!showContactModal || !selectedPackage) return null;
     
-    // Prepare WhatsApp message - message variable is used in the onClick handler
-    var whatsappMessage = 'Hello%2C%20I%20am%20interested%20in%20the%20' + selectedPackage.name + '%20package%20(' + selectedPackage.accounts + '%20accounts)%20costing%20KES%20' + selectedPackage.cost + '%20with%20daily%20income%20potential%20of%20KES%20' + selectedPackage.daily + '.%20Please%20send%20me%20more%20information.';
-    
     return React.createElement('div', {
       className: 'modal show d-block',
       style: { backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflowY: 'auto' },
