@@ -217,6 +217,13 @@ const TestimonialsPartners = () => {
             )
           )
         )
+      ),
+      
+      // Footer Credit - Fixed: Removed marquee and replaced with proper element
+      React.createElement('div', { className: 'text-center mt-4 pt-3 border-top' },
+        React.createElement('small', { className: 'text-muted' },
+          'Developed by YobbyTech | Contact: 0116378188'
+        )
       )
     )
   );

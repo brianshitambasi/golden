@@ -1,54 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar as BootstrapNavbar, Nav, Container, Button } from 'react-bootstrap';
+import { Navbar as BootstrapNavbar, Nav, Container, Button, NavDropdown } from 'react-bootstrap';
+import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeLink, setActiveLink] = useState('home');
+  const location = useLocation();
+  const [activeLink, setActiveLink] = useState('/');
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-      
-      // Update active link based on scroll position
-      const sections = ['home', 'about', 'products', 'compensation', 'global', 'testimonials', 'packages'];
-      const scrollPosition = window.scrollY + 100;
-      
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveLink(section);
-            break;
-          }
-        }
-      }
     };
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    setActiveLink(location.pathname);
+  }, [location]);
+
   const navLinks = [
-    { href: '#home', label: 'Home', icon: 'fas fa-home' },
-    { href: '#about', label: 'About', icon: 'fas fa-info-circle' },
-    { href: '#products', label: 'Products', icon: 'fas fa-box' },
-    { href: '#compensation', label: 'Compensation', icon: 'fas fa-chart-line' },
-    { href: '#global', label: 'Global Reach', icon: 'fas fa-globe' },
-    { href: '#testimonials', label: 'Testimonials', icon: 'fas fa-star' },
-    { href: '#packages', label: 'Packages', icon: 'fas fa-gem' },
+    { path: '/', label: 'Home', icon: 'fas fa-home' },
+    { path: '/about', label: 'About', icon: 'fas fa-info-circle' },
+    { path: '/products', label: 'Products', icon: 'fas fa-box' },
+    { path: '/global', label: 'Global Reach', icon: 'fas fa-globe' },
+    { path: '/testimonials', label: 'Testimonials', icon: 'fas fa-star' },
   ];
 
-  const scrollToSection = (href, sectionId) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    setActiveLink(sectionId);
-    setIsOpen(false);
-  };
+  const businessDropdown = [
+    { path: '/board', label: 'Board of Directors', icon: 'fas fa-users', description: 'Meet our leadership team' },
+    { path: '/compensation', label: 'Compensation Plan', icon: 'fas fa-chart-line', description: 'View our earning structure' },
+    { path: '/packages', label: 'Startup Packages', icon: 'fas fa-gem', description: 'Choose your investment plan' },
+  ];
 
   return (
     <BootstrapNavbar 
@@ -66,9 +52,9 @@ const NavBar = () => {
       <Container>
         {/* Logo */}
         <BootstrapNavbar.Brand 
-          onClick={() => scrollToSection('#home', 'home')}
+          as={Link}
+          to="/"
           className="cursor-pointer brand-logo"
-          style={{ cursor: 'pointer' }}
         >
           <div className="d-flex align-items-center gap-2">
             <div className="logo-icon">
@@ -96,17 +82,16 @@ const NavBar = () => {
 
         {/* Navigation Links */}
         <BootstrapNavbar.Collapse id="basic-navbar-nav">
-          <Nav className="mx-auto d-flex gap-2">
+          <Nav className="mx-auto d-flex gap-2 align-items-center">
+            {/* Main Navigation Links */}
             {navLinks.map(link => {
-              const isActive = activeLink === link.href.substring(1);
+              const isActive = activeLink === link.path;
               return (
                 <Nav.Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => { 
-                    e.preventDefault(); 
-                    scrollToSection(link.href, link.href.substring(1)); 
-                  }}
+                  key={link.path}
+                  as={Link}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
                   className={`nav-link-custom ${isActive ? 'active' : ''} px-3 py-2 rounded-pill`}
                   style={{
                     fontWeight: '600',
@@ -120,11 +105,72 @@ const NavBar = () => {
                 </Nav.Link>
               );
             })}
+
+            {/* Business Dropdown */}
+            <NavDropdown
+              title={
+                <span>
+                  <i className="fas fa-chart-line me-2"></i>
+                  Business
+                </span>
+              }
+              id="business-dropdown"
+              className="nav-dropdown-custom"
+              menuVariant="light"
+            >
+              {businessDropdown.map((item, idx) => (
+                <NavDropdown.Item
+                  key={idx}
+                  as={Link}
+                  to={item.path}
+                  onClick={() => setIsOpen(false)}
+                  className="dropdown-item-custom"
+                >
+                  <div className="d-flex align-items-center">
+                    <div className="dropdown-icon me-3">
+                      <i className={`${item.icon} text-warning`}></i>
+                    </div>
+                    <div>
+                      <div className="fw-semibold">{item.label}</div>
+                      <small className="text-muted">{item.description}</small>
+                    </div>
+                  </div>
+                </NavDropdown.Item>
+              ))}
+              <NavDropdown.Divider />
+              <NavDropdown.Item 
+                as={Link}
+                to="/compensation"
+                onClick={() => setIsOpen(false)}
+                className="dropdown-item-custom text-center"
+              >
+                <i className="fas fa-calculator me-2"></i>
+                Calculate Your Earnings
+              </NavDropdown.Item>
+            </NavDropdown>
+
+            {/* Contact Link */}
+            <Nav.Link
+              as={Link}
+              to="/contact"
+              onClick={() => setIsOpen(false)}
+              className={`nav-link-custom ${activeLink === '/contact' ? 'active' : ''} px-3 py-2 rounded-pill`}
+              style={{
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                color: activeLink === '/contact' ? '#D4AF37' : '#4a5568',
+                backgroundColor: activeLink === '/contact' ? 'rgba(212, 175, 55, 0.1)' : 'transparent'
+              }}
+            >
+              <i className="fas fa-headset me-2"></i>
+              Contact
+            </Nav.Link>
           </Nav>
 
           {/* Join Now Button */}
           <Button
-            onClick={() => scrollToSection('#packages', 'packages')}
+            as={Link}
+            to="/packages"
             className="btn-join ms-lg-3"
             style={{
               background: 'linear-gradient(135deg, #D4AF37, #B8860B)',
@@ -211,6 +257,39 @@ const NavBar = () => {
           border-radius: 3px;
         }
         
+        .nav-dropdown-custom .dropdown-toggle {
+          font-weight: 600;
+          color: #4a5568;
+          transition: all 0.3s ease;
+          padding: 8px 16px;
+          border-radius: 50px;
+        }
+        
+        .nav-dropdown-custom .dropdown-toggle:hover {
+          color: #D4AF37 !important;
+          background-color: rgba(212, 175, 55, 0.1) !important;
+        }
+        
+        .dropdown-item-custom {
+          padding: 10px 20px;
+          transition: all 0.3s ease;
+        }
+        
+        .dropdown-item-custom:hover {
+          background-color: rgba(212, 175, 55, 0.1);
+          transform: translateX(5px);
+        }
+        
+        .dropdown-icon {
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(212, 175, 55, 0.1);
+          border-radius: 8px;
+        }
+        
         .btn-join {
           position: relative;
           overflow: hidden;
@@ -242,6 +321,16 @@ const NavBar = () => {
           .nav-link-custom {
             text-align: center;
             margin: 5px 0;
+          }
+          
+          .nav-dropdown-custom .dropdown-toggle {
+            text-align: center;
+            width: 100%;
+          }
+          
+          .dropdown-menu {
+            width: 100%;
+            text-align: center;
           }
           
           .btn-join {
