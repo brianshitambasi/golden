@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Container, Row, Col, Button, Carousel } from 'react-bootstrap';
+import * as THREE from 'three';
 
 const HomeComponent = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showWebinarModal, setShowWebinarModal] = useState(false);
+  const [showCoffeeModal, setShowCoffeeModal] = useState(false);
+  const mountRef = useRef(null);
 
   // All images from your static folder
   const staticImages = [
@@ -24,11 +28,6 @@ const HomeComponent = () => {
     '/images/static/IMG-20260406-WA0981.jpg',
   ];
 
-  // Hero Background Image - Using bonan.jpg
-  // Make sure bonan.jpg is in your public/images/static/ folder
-  const heroBackgroundImage = '/images/static/bonan.jpg';
-
-  // Carousel slides with content
   const carouselSlides = [
     {
       id: 1,
@@ -64,15 +63,6 @@ const HomeComponent = () => {
     }
   ];
 
-  // Auto-slide effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [carouselSlides.length]);
-
-  // List of countries for display
   const countriesList = [
     "🇺🇸 USA", "🇬🇧 UK", "🇨🇦 Canada", "🇦🇺 Australia", "🇩🇪 Germany", "🇫🇷 France", "🇯🇵 Japan",
     "🇨🇳 China", "🇮🇳 India", "🇧🇷 Brazil", "🇿🇦 South Africa", "🇰🇪 Kenya", "🇳🇬 Nigeria",
@@ -80,400 +70,516 @@ const HomeComponent = () => {
     "🇵🇭 Philippines", "🇻🇳 Vietnam", "🇹🇭 Thailand", "🇰🇷 South Korea", "🇲🇽 Mexico", "🇦🇷 Argentina"
   ];
 
+  // --- 3D Scene Setup with Professional Gold/Diamond Theme ---
+  useEffect(() => {
+    if (!mountRef.current) return;
+    const mountNode = mountRef.current;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x05070a);
+    scene.fog = new THREE.FogExp2(0x05070a, 0.006);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1, 7);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    mountNode.appendChild(renderer.domElement);
+
+    // --- Diamond-like Central Object (Icosahedron with gold material) ---
+    const geometry = new THREE.IcosahedronGeometry(1.1, 0);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffd700,
+      emissive: 0x442200,
+      roughness: 0.25,
+      metalness: 0.95,
+      emissiveIntensity: 0.4,
+    });
+    const coreMesh = new THREE.Mesh(geometry, material);
+    scene.add(coreMesh);
+
+    // Gold wireframe
+    const edgesGeo = new THREE.EdgesGeometry(geometry);
+    const edgesMat = new THREE.LineBasicMaterial({ color: 0xffaa33 });
+    const wireframe = new THREE.LineSegments(edgesGeo, edgesMat);
+    coreMesh.add(wireframe);
+
+    // --- Floating Diamonds / Particles (Luxury effect) ---
+    const particleCount = 2500;
+    const particlesGeometry = new THREE.BufferGeometry();
+    const posArray = new Float32Array(particleCount * 3);
+    const colorArray = new Float32Array(particleCount * 3);
+    
+    for (let i = 0; i < particleCount; i++) {
+      posArray[i*3] = (Math.random() - 0.5) * 50;
+      posArray[i*3+1] = (Math.random() - 0.5) * 25;
+      posArray[i*3+2] = (Math.random() - 0.5) * 35 - 15;
+      
+      // Gold/white particles
+      const isGold = Math.random() > 0.7;
+      colorArray[i*3] = isGold ? 1.0 : 0.9;
+      colorArray[i*3+1] = isGold ? 0.8 : 0.7;
+      colorArray[i*3+2] = isGold ? 0.2 : 0.4;
+    }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+    
+    const particlesMat = new THREE.PointsMaterial({
+      size: 0.06,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+    });
+    const particlesSys = new THREE.Points(particlesGeometry, particlesMat);
+    scene.add(particlesSys);
+
+    // --- Rotating Ring (Crown effect) ---
+    const ringGeo = new THREE.TorusGeometry(1.7, 0.06, 128, 200);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0xffaa44, metalness: 0.9, roughness: 0.3, emissive: 0x442200 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    scene.add(ring);
+    
+    const outerRingGeo = new THREE.TorusGeometry(2.0, 0.04, 128, 200);
+    const outerRingMat = new THREE.MeshStandardMaterial({ color: 0xffdd88, metalness: 0.8 });
+    const outerRing = new THREE.Mesh(outerRingGeo, outerRingMat);
+    scene.add(outerRing);
+
+    // --- Floating small diamonds around ---
+    const diamondGroup = [];
+    const diamondPositions = [
+      [-2.2, 1.3, 1.5], [2.2, 1.3, 1.5], [-1.8, -1.2, 2.0], [1.8, -1.2, 2.0],
+      [0, 2.0, 1.2], [0, -1.8, 2.2], [-2.5, 0.5, 1.0], [2.5, 0.5, 1.0]
+    ];
+    const diamondGeo = new THREE.TetrahedronGeometry(0.18);
+    diamondPositions.forEach(pos => {
+      const diamondMat = new THREE.MeshStandardMaterial({ color: 0xffcc55, metalness: 0.9, emissive: 0x331100 });
+      const diamond = new THREE.Mesh(diamondGeo, diamondMat);
+      diamond.position.set(pos[0], pos[1], pos[2]);
+      scene.add(diamond);
+      diamondGroup.push(diamond);
+    });
+
+    // --- Lighting (Dramatic, highlighting gold tones) ---
+    const ambientLight = new THREE.AmbientLight(0x222222);
+    scene.add(ambientLight);
+    const mainLight = new THREE.DirectionalLight(0xffdd99, 1.3);
+    mainLight.position.set(3, 5, 2);
+    scene.add(mainLight);
+    const backLight = new THREE.PointLight(0xffaa55, 0.8);
+    backLight.position.set(-2, 1, -4);
+    scene.add(backLight);
+    const fillLight = new THREE.PointLight(0xffaa66, 0.5);
+    fillLight.position.set(2, 2, 3);
+    scene.add(fillLight);
+    const rimLight = new THREE.PointLight(0xffcc88, 0.9);
+    rimLight.position.set(1, 2, -3.5);
+    scene.add(rimLight);
+    const bottomLight = new THREE.PointLight(0xff9933, 0.4);
+    bottomLight.position.set(0, -3, 0);
+    scene.add(bottomLight);
+
+    let time = 0;
+    const animate = () => {
+      requestAnimationFrame(animate);
+      time += 0.008;
+      
+      coreMesh.rotation.y = time * 0.6;
+      coreMesh.rotation.x = Math.sin(time * 0.4) * 0.2;
+      ring.rotation.z = time * 0.3;
+      ring.rotation.x = Math.sin(time * 0.5) * 0.15;
+      outerRing.rotation.z = -time * 0.25;
+      outerRing.rotation.y = time * 0.2;
+      
+      particlesSys.rotation.y = time * 0.03;
+      particlesSys.rotation.x = Math.sin(time * 0.1) * 0.05;
+      
+      diamondGroup.forEach((diamond, idx) => {
+        diamond.rotation.x = time * 0.5 * (idx % 2 === 0 ? 1 : -1);
+        diamond.rotation.y = time * 0.8;
+      });
+      
+      camera.position.x += (0 - camera.position.x) * 0.02;
+      camera.position.y += (Math.sin(time * 0.2) * 0.08 - camera.position.y) * 0.03;
+      camera.lookAt(0, 0.3, 0);
+      
+      renderer.render(scene, camera);
+    };
+    
+    animate();
+
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (mountNode && renderer.domElement) {
+        mountNode.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [carouselSlides.length]);
+
   return (
     <>
-      {/* Hero Section - Bonan.jpg Background */}
-      <section id="home" className="position-relative min-vh-100 d-flex align-items-center overflow-hidden">
-        {/* Static Image Background - bonan.jpg */}
-        <div className="position-absolute top-0 start-0 w-100 h-100 z-0">
-          <img 
-            src={heroBackgroundImage}
-            alt="Bonan Vivon Project"
-            className="position-absolute top-0 start-0 w-100 h-100"
-            style={{ objectFit: 'cover' }}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop';
-            }}
-          />
-          {/* Dark overlay for better text readability */}
-          <div className="position-absolute top-0 start-0 w-100 h-100" style={{
-            background: 'linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%)',
-            zIndex: 10
-          }}></div>
-          {/* Golden gradient overlay */}
-          <div className="position-absolute top-0 start-0 w-100 h-100" style={{
-            background: 'radial-gradient(circle at center, rgba(212,175,55,0.15) 0%, transparent 70%)',
-            zIndex: 10
-          }}></div>
-        </div>
-
-        {/* Content Over Image */}
-        <Container className="position-relative z-20 py-5">
-          <Row className="align-items-center min-vh-100">
-            <Col lg={8} className="text-center text-lg-start">
-              <div className="d-inline-flex align-items-center gap-2 bg-dark/50 backdrop-blur-sm px-4 py-2 rounded-pill mb-4 border border-warning/30 animate-fade-in">
-                <span className="position-relative d-flex h-3 w-3">
-                  <span className="animate-ping position-absolute d-inline-flex h-100 w-100 rounded-circle bg-warning opacity-75"></span>
-                  <span className="position-relative d-inline-flex rounded-circle h-3 w-3 bg-warning"></span>
-                </span>
-                <span className="text-warning small fw-semibold tracking-wide">🌍 BONAN VIVON PROJECT • ALLIANCE IN MOTION GLOBAL</span>
-              </div>
-              
-              <h1 className="display-1 fw-bold text-white mb-3 animate-slide-up">
-                GOLDEN 
-                <span className="text-warning d-block d-md-inline-block ms-md-3">DREAMERS</span>
-              </h1>
-              
-              <p className="fs-2 text-white-50 mb-2 fw-semibold animate-slide-up">Empowering Dreams Across the Globe</p>
-              <div className="h-1 w-25 bg-warning my-4 rounded-pill animate-slide-up"></div>
-              <p className="fs-4 text-white-50 mb-4 animate-slide-up">
-                Join <strong className="text-warning">Alliance In Motion's BONAN VIVON PROJECT</strong> — a revolutionary network marketing system that transforms ordinary individuals into extraordinary leaders across <strong className="text-warning">60+ countries worldwide</strong>.
-              </p>
-              
-              <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start animate-slide-up">
-                <Button 
-                  variant="warning" 
-                  size="lg" 
-                  className="px-5 py-3 fw-bold rounded-pill shadow-lg"
-                  style={{
-                    background: 'linear-gradient(135deg, #D4AF37, #B8860B)',
-                    border: 'none',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-3px)';
-                    e.target.style.boxShadow = '0 10px 30px rgba(212,175,55,0.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                >
-                  <i className="fas fa-rocket me-2"></i> Start Your Journey
-                </Button>
-                <Button 
-                  variant="outline-light" 
-                  size="lg" 
-                  className="px-5 py-3 fw-bold rounded-pill"
-                  style={{ transition: 'all 0.3s ease' }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-3px)';
-                    e.target.style.backgroundColor = 'rgba(255,255,255,0.2)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <i className="fas fa-play-circle me-2"></i> Watch Bonan Vivon Story
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-
-        {/* Scroll Indicator */}
-        <div className="position-absolute bottom-0 start-50 translate-middle-x z-20 animate-bounce mb-4">
-          <div className="w-8 h-12 border-2 border-warning rounded-pill d-flex justify-content-center">
-            <div className="w-1-5 h-3 bg-warning rounded-pill mt-2 animate-pulse"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Image Carousel Section with All Static Images */}
-      <section className="py-5" style={{ background: 'linear-gradient(135deg, #0f0f1a, #1a1a2e)' }}>
-        <Container>
-          <div className="text-center mb-5">
-            <span className="text-warning fw-semibold small text-uppercase bg-warning/10 px-4 py-2 rounded-pill d-inline-block mb-3">
-              <i className="fas fa-images me-2"></i> OUR GALLERY
-            </span>
-            <h2 className="display-4 fw-bold text-white">
-              Success <span className="text-warning">Moments</span>
-            </h2>
-            <div className="gold-divider mx-auto mt-3"></div>
-            <p className="text-white-50 mt-3">Capturing the journey of Golden Dreamers across Africa</p>
-          </div>
-
-          {/* Full Image Carousel */}
-          <Carousel 
-            interval={4000}
-            indicators={true}
-            controls={true}
-            pause="hover"
-            className="image-carousel"
-            style={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
-          >
-            {staticImages.map((image, index) => (
-              <Carousel.Item key={index}>
-                <div style={{ 
-                  position: 'relative', 
-                  height: '550px', 
-                  width: '100%',
-                  backgroundColor: '#000',
-                  overflow: 'hidden'
-                }}>
-                  <img
-                    className="d-block w-100 h-100"
-                    src={image}
-                    alt={`Golden Dreamers Event ${index + 1}`}
-                    style={{
-                      objectFit: 'contain',
-                      width: '100%',
-                      height: '100%',
-                      backgroundColor: '#1a1a2e'
-                    }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/1200x550/1a1a2e/D4AF37?text=Golden+Dreamers+Event';
-                    }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
-                    padding: '60px 20px 20px',
-                    textAlign: 'center'
-                  }}>
-                    <h3 className="text-white mb-1 fs-3">Golden Dreamers Event</h3>
-                    <p className="text-warning mb-0">Celebrating Success & Leadership</p>
-                  </div>
+      {/* 3D Canvas Background */}
+      <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }} />
+      
+      {/* Main Content */}
+      <div style={{ position: 'relative', zIndex: 2 }}>
+        
+        {/* Hero Section */}
+        <section id="home" className="position-relative min-vh-100 d-flex align-items-center" style={{ background: 'transparent' }}>
+          <Container className="py-5">
+            <Row className="align-items-center min-vh-100">
+              <Col lg={8} className="text-center text-lg-start">
+                <div className="d-inline-flex align-items-center gap-2 bg-dark/50 backdrop-blur-sm px-4 py-2 rounded-pill mb-4 border border-warning/30 animate-fade-in">
+                  <span className="position-relative d-flex h-3 w-3">
+                    <span className="animate-ping position-absolute d-inline-flex h-100 w-100 rounded-circle bg-warning opacity-75"></span>
+                    <span className="position-relative d-inline-flex rounded-circle h-3 w-3 bg-warning"></span>
+                  </span>
+                  <span className="text-warning small fw-semibold tracking-wide">🌍 BONAN VIVON PROJECT • ALLIANCE IN MOTION GLOBAL</span>
                 </div>
-                <Carousel.Caption className="d-none d-md-block">
-                  <h5 className="text-warning">Golden Dreamers Family</h5>
-                  <p className="text-white">Building leaders that last across the globe</p>
-                </Carousel.Caption>
-              </Carousel.Item>
-            ))}
-          </Carousel>
-
-          {/* Thumbnail Gallery Grid */}
-          <div className="mt-5">
-            <h4 className="text-center text-white mb-4">Event Highlights</h4>
-            <Row className="g-3">
-              {staticImages.slice(0, 8).map((image, index) => (
-                <Col xs={6} md={3} key={index}>
-                  <div 
-                    className="thumbnail-card"
-                    style={{
-                      borderRadius: '15px',
-                      overflow: 'hidden',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      height: '180px',
-                      backgroundColor: '#2a2a3e'
-                    }}
-                    onClick={() => {
-                      const modal = document.createElement('div');
-                      modal.style.position = 'fixed';
-                      modal.style.top = '0';
-                      modal.style.left = '0';
-                      modal.style.width = '100%';
-                      modal.style.height = '100%';
-                      modal.style.backgroundColor = 'rgba(0,0,0,0.95)';
-                      modal.style.zIndex = '9999';
-                      modal.style.display = 'flex';
-                      modal.style.alignItems = 'center';
-                      modal.style.justifyContent = 'center';
-                      modal.style.cursor = 'pointer';
-                      modal.onclick = () => modal.remove();
-                      const img = document.createElement('img');
-                      img.src = image;
-                      img.style.maxWidth = '90%';
-                      img.style.maxHeight = '90%';
-                      img.style.objectFit = 'contain';
-                      img.style.borderRadius = '10px';
-                      img.style.border = '3px solid #D4AF37';
-                      modal.appendChild(img);
-                      document.body.appendChild(modal);
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.05)';
-                      e.currentTarget.style.boxShadow = '0 10px 20px rgba(212,175,55,0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <img
-                      src={image}
-                      alt={`Thumbnail ${index + 1}`}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'all 0.3s ease'
-                      }}
-                    />
-                  </div>
-                </Col>
-              ))}
-            </Row>
-          </div>
-
-          {/* View All Button */}
-          <div className="text-center mt-4">
-            <Button 
-              variant="outline-warning" 
-              className="rounded-pill px-4 py-2"
-              onClick={() => {
-                const modal = document.createElement('div');
-                modal.style.position = 'fixed';
-                modal.style.top = '0';
-                modal.style.left = '0';
-                modal.style.width = '100%';
-                modal.style.height = '100%';
-                modal.style.backgroundColor = 'rgba(0,0,0,0.95)';
-                modal.style.zIndex = '9999';
-                modal.style.overflowY = 'auto';
-                modal.style.padding = '20px';
-                modal.onclick = (e) => {
-                  if (e.target === modal) modal.remove();
-                };
                 
-                const galleryContainer = document.createElement('div');
-                galleryContainer.style.maxWidth = '1200px';
-                galleryContainer.style.margin = '0 auto';
-                galleryContainer.style.display = 'grid';
-                galleryContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(250px, 1fr))';
-                galleryContainer.style.gap = '15px';
+                <h1 className="display-1 fw-bold text-white mb-3 animate-slide-up">
+                  GOLDEN 
+                  <span className="text-warning d-block d-md-inline-block ms-md-3">DREAMERS</span>
+                </h1>
                 
-                staticImages.forEach(imgSrc => {
-                  const imgDiv = document.createElement('div');
-                  imgDiv.style.cursor = 'pointer';
-                  imgDiv.style.borderRadius = '10px';
-                  imgDiv.style.overflow = 'hidden';
-                  imgDiv.style.transition = 'transform 0.3s ease';
-                  imgDiv.onmouseenter = () => imgDiv.style.transform = 'scale(1.05)';
-                  imgDiv.onmouseleave = () => imgDiv.style.transform = 'scale(1)';
-                  
-                  const img = document.createElement('img');
-                  img.src = imgSrc;
-                  img.style.width = '100%';
-                  img.style.height = '200px';
-                  img.style.objectFit = 'cover';
-                  
-                  imgDiv.appendChild(img);
-                  galleryContainer.appendChild(imgDiv);
-                });
+                <p className="fs-2 text-white-50 mb-2 fw-semibold animate-slide-up">Empowering Dreams Across the Globe</p>
+                <div className="h-1 w-25 bg-warning my-4 rounded-pill animate-slide-up"></div>
+                <p className="fs-4 text-white-50 mb-4 animate-slide-up">
+                  Join <strong className="text-warning">Alliance In Motion's BONAN VIVON PROJECT</strong> — a revolutionary network marketing system that transforms ordinary individuals into extraordinary leaders across <strong className="text-warning">60+ countries worldwide</strong>.
+                </p>
                 
-                modal.appendChild(galleryContainer);
-                document.body.appendChild(modal);
-              }}
-            >
-              <i className="fas fa-images me-2"></i> View All {staticImages.length} Photos
-            </Button>
-          </div>
-        </Container>
-      </section>
-
-      {/* Content Carousel Section */}
-      <section className="py-5" style={{ background: 'linear-gradient(135deg, #1a1a2e, #16213e)' }}>
-        <Container>
-          <div className="text-center mb-5">
-            <span className="text-warning fw-semibold small text-uppercase bg-warning/10 px-4 py-2 rounded-pill d-inline-block mb-3">
-              <i className="fas fa-star me-2"></i> THE BONAN VIVON EXPERIENCE
-            </span>
-            <h2 className="display-4 fw-bold text-white">
-              Discover Your <span className="text-warning">Path to Success</span>
-            </h2>
-            <div className="gold-divider mx-auto mt-3"></div>
-          </div>
-          
-          <Carousel 
-            activeIndex={currentSlide}
-            onSelect={(selectedIndex) => setCurrentSlide(selectedIndex)}
-            interval={5000}
-            indicators={true}
-            controls={true}
-            pause="hover"
-            className="carousel-custom"
-          >
-            {carouselSlides.map((slide) => (
-              <Carousel.Item key={slide.id}>
-                <div className="p-5 text-center" style={{ minHeight: '400px' }}>
-                  <div className="icon-circle mb-4 mx-auto">
-                    <i className={`${slide.icon} display-1 text-warning`}></i>
-                  </div>
-                  <h3 className="display-5 mb-3 text-white">{slide.title}</h3>
-                  <p className="lead text-warning mb-3">{slide.subtitle}</p>
-                  <p className="fs-5 text-white-50">{slide.description}</p>
+                <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start animate-slide-up">
                   <Button 
-                    variant="outline-warning" 
-                    className="mt-3 rounded-pill px-4 py-2"
-                    style={{ transition: 'all 0.3s ease' }}
+                    onClick={() => setShowCoffeeModal(true)}
+                    variant="warning" 
+                    size="lg" 
+                    className="px-5 py-3 fw-bold rounded-pill shadow-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, #D4AF37, #B8860B)',
+                      border: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
                     onMouseEnter={(e) => {
-                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.transform = 'translateY(-3px)';
+                      e.target.style.boxShadow = '0 10px 30px rgba(212,175,55,0.5)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = 'none';
                     }}
                   >
-                    {slide.ctaText} <i className="fas fa-arrow-right ms-2"></i>
+                    <i className="fas fa-coffee me-2"></i> Schedule Success Coffee
+                  </Button>
+                  <Button 
+                    onClick={() => setShowWebinarModal(true)}
+                    variant="outline-light" 
+                    size="lg" 
+                    className="px-5 py-3 fw-bold rounded-pill"
+                    style={{ transition: 'all 0.3s ease' }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-3px)';
+                      e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <i className="fas fa-video me-2"></i> Wealth Renaissance Webinar
                   </Button>
                 </div>
-              </Carousel.Item>
+              </Col>
+            </Row>
+          </Container>
+
+          {/* Scroll Indicator */}
+          <div className="position-absolute bottom-0 start-50 translate-middle-x z-20 animate-bounce mb-4">
+            <div className="w-8 h-12 border-2 border-warning rounded-pill d-flex justify-content-center">
+              <div className="w-1-5 h-3 bg-warning rounded-pill mt-2 animate-pulse"></div>
+            </div>
+          </div>
+        </section>
+
+        {/* Image Carousel Section */}
+        <section className="py-5" style={{ background: 'rgba(15, 20, 35, 0.8)', backdropFilter: 'blur(10px)' }}>
+          <Container>
+            <div className="text-center mb-5">
+              <span className="text-warning fw-semibold small text-uppercase bg-warning/10 px-4 py-2 rounded-pill d-inline-block mb-3">
+                <i className="fas fa-images me-2"></i> OUR GALLERY
+              </span>
+              <h2 className="display-4 fw-bold text-white">
+                Success <span className="text-warning">Moments</span>
+              </h2>
+              <div className="gold-divider mx-auto mt-3"></div>
+              <p className="text-white-50 mt-3">Capturing the journey of Golden Dreamers across Africa</p>
+            </div>
+
+            <Carousel 
+              interval={4000}
+              indicators={true}
+              controls={true}
+              pause="hover"
+              className="image-carousel"
+              style={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
+            >
+              {staticImages.map((image, index) => (
+                <Carousel.Item key={index}>
+                  <div style={{ 
+                    position: 'relative', 
+                    height: '550px', 
+                    width: '100%',
+                    backgroundColor: '#000',
+                    overflow: 'hidden'
+                  }}>
+                    <img
+                      className="d-block w-100 h-100"
+                      src={image}
+                      alt={`Golden Dreamers Event ${index + 1}`}
+                      style={{
+                        objectFit: 'contain',
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: '#1a1a2e'
+                      }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/1200x550/1a1a2e/D4AF37?text=Golden+Dreamers+Event';
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+                      padding: '60px 20px 20px',
+                      textAlign: 'center'
+                    }}>
+                      <h3 className="text-white mb-1 fs-3">Golden Dreamers Event</h3>
+                      <p className="text-warning mb-0">Celebrating Success & Leadership</p>
+                    </div>
+                  </div>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+
+            {/* Thumbnail Gallery Grid */}
+            <div className="mt-5">
+              <h4 className="text-center text-white mb-4">Event Highlights</h4>
+              <Row className="g-3">
+                {staticImages.slice(0, 8).map((image, index) => (
+                  <Col xs={6} md={3} key={index}>
+                    <div 
+                      className="thumbnail-card"
+                      style={{
+                        borderRadius: '15px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        height: '180px',
+                        backgroundColor: '#2a2a3e'
+                      }}
+                      onClick={() => {
+                        const modal = document.createElement('div');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '0';
+                        modal.style.left = '0';
+                        modal.style.width = '100%';
+                        modal.style.height = '100%';
+                        modal.style.backgroundColor = 'rgba(0,0,0,0.95)';
+                        modal.style.zIndex = '9999';
+                        modal.style.display = 'flex';
+                        modal.style.alignItems = 'center';
+                        modal.style.justifyContent = 'center';
+                        modal.style.cursor = 'pointer';
+                        modal.onclick = () => modal.remove();
+                        const img = document.createElement('img');
+                        img.src = image;
+                        img.style.maxWidth = '90%';
+                        img.style.maxHeight = '90%';
+                        img.style.objectFit = 'contain';
+                        img.style.borderRadius = '10px';
+                        img.style.border = '3px solid #D4AF37';
+                        modal.appendChild(img);
+                        document.body.appendChild(modal);
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                        e.currentTarget.style.boxShadow = '0 10px 20px rgba(212,175,55,0.3)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <img
+                        src={image}
+                        alt={`Thumbnail ${index + 1}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'all 0.3s ease'
+                        }}
+                      />
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          </Container>
+        </section>
+
+        {/* Content Carousel Section */}
+        <section className="py-5" style={{ background: 'rgba(26, 30, 45, 0.9)', backdropFilter: 'blur(10px)' }}>
+          <Container>
+            <div className="text-center mb-5">
+              <span className="text-warning fw-semibold small text-uppercase bg-warning/10 px-4 py-2 rounded-pill d-inline-block mb-3">
+                <i className="fas fa-star me-2"></i> THE BONAN VIVON EXPERIENCE
+              </span>
+              <h2 className="display-4 fw-bold text-white">
+                Discover Your <span className="text-warning">Path to Success</span>
+              </h2>
+              <div className="gold-divider mx-auto mt-3"></div>
+            </div>
+            
+            <Carousel 
+              activeIndex={currentSlide}
+              onSelect={(selectedIndex) => setCurrentSlide(selectedIndex)}
+              interval={5000}
+              indicators={true}
+              controls={true}
+              pause="hover"
+              className="carousel-custom"
+            >
+              {carouselSlides.map((slide) => (
+                <Carousel.Item key={slide.id}>
+                  <div className="p-5 text-center" style={{ minHeight: '400px' }}>
+                    <div className="icon-circle mb-4 mx-auto">
+                      <i className={`${slide.icon} display-1 text-warning`}></i>
+                    </div>
+                    <h3 className="display-5 mb-3 text-white">{slide.title}</h3>
+                    <p className="lead text-warning mb-3">{slide.subtitle}</p>
+                    <p className="fs-5 text-white-50">{slide.description}</p>
+                    <Button 
+                      variant="outline-warning" 
+                      className="mt-3 rounded-pill px-4 py-2"
+                      style={{ transition: 'all 0.3s ease' }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      {slide.ctaText} <i className="fas fa-arrow-right ms-2"></i>
+                    </Button>
+                  </div>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </Container>
+        </section>
+
+        {/* Stats Section */}
+        <section className="py-5" style={{ background: 'linear-gradient(135deg, #f8f9fa, #ffffff)' }}>
+          <Container>
+            <Row className="text-center g-4">
+              <Col md={3}>
+                <div className="stat-card p-4 rounded-4 shadow-sm">
+                  <i className="fas fa-globe-africa display-4 text-warning mb-3"></i>
+                  <h3 className="display-4 fw-bold text-dark">60+</h3>
+                  <p className="text-muted">Countries Worldwide</p>
+                </div>
+              </Col>
+              <Col md={3}>
+                <div className="stat-card p-4 rounded-4 shadow-sm">
+                  <i className="fas fa-calendar-alt display-4 text-warning mb-3"></i>
+                  <h3 className="display-4 fw-bold text-dark">2006</h3>
+                  <p className="text-muted">Years of Excellence</p>
+                </div>
+              </Col>
+              <Col md={3}>
+                <div className="stat-card p-4 rounded-4 shadow-sm">
+                  <i className="fas fa-users display-4 text-warning mb-3"></i>
+                  <h3 className="display-4 fw-bold text-dark">1M+</h3>
+                  <p className="text-muted">Lives Impacted</p>
+                </div>
+              </Col>
+              <Col md={3}>
+                <div className="stat-card p-4 rounded-4 shadow-sm">
+                  <i className="fas fa-chart-line display-4 text-warning mb-3"></i>
+                  <h3 className="display-4 fw-bold text-dark">KES 137M+</h3>
+                  <p className="text-muted">Earning Potential</p>
+                </div>
+              </Col>
+            </Row>
+          </Container>
+        </section>
+
+        {/* Floating Countries Banner */}
+        <div className="py-3" style={{ background: 'linear-gradient(90deg, #1a1a2e, #2a2a3e, #1a1a2e)', overflow: 'hidden' }}>
+          <div className="d-flex animate-marquee" style={{ whiteSpace: 'nowrap' }}>
+            {countriesList.map((country, index) => (
+              <span key={index} className="mx-3 text-warning fw-semibold">
+                {country} <i className="fas fa-globe ms-1 text-white-50"></i>
+              </span>
             ))}
-          </Carousel>
-        </Container>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-5" style={{ background: 'linear-gradient(135deg, #f8f9fa, #ffffff)' }}>
-        <Container>
-          <Row className="text-center g-4">
-            <Col md={3}>
-              <div className="stat-card p-4 rounded-4 shadow-sm">
-                <i className="fas fa-globe-africa display-4 text-warning mb-3"></i>
-                <h3 className="display-4 fw-bold text-dark">60+</h3>
-                <p className="text-muted">Countries Worldwide</p>
-              </div>
-            </Col>
-            <Col md={3}>
-              <div className="stat-card p-4 rounded-4 shadow-sm">
-                <i className="fas fa-calendar-alt display-4 text-warning mb-3"></i>
-                <h3 className="display-4 fw-bold text-dark">2006</h3>
-                <p className="text-muted">Years of Excellence</p>
-              </div>
-            </Col>
-            <Col md={3}>
-              <div className="stat-card p-4 rounded-4 shadow-sm">
-                <i className="fas fa-users display-4 text-warning mb-3"></i>
-                <h3 className="display-4 fw-bold text-dark">1M+</h3>
-                <p className="text-muted">Lives Impacted</p>
-              </div>
-            </Col>
-            <Col md={3}>
-              <div className="stat-card p-4 rounded-4 shadow-sm">
-                <i className="fas fa-chart-line display-4 text-warning mb-3"></i>
-                <h3 className="display-4 fw-bold text-dark">KES 137M+</h3>
-                <p className="text-muted">Earning Potential</p>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-      </section>
-
-      {/* Floating Countries Banner */}
-      <div className="py-3" style={{ background: 'linear-gradient(90deg, #1a1a2e, #2a2a3e, #1a1a2e)', overflow: 'hidden' }}>
-        <div className="d-flex animate-marquee" style={{ whiteSpace: 'nowrap' }}>
-          {countriesList.map((country, index) => (
-            <span key={index} className="mx-3 text-warning fw-semibold">
-              {country} <i className="fas fa-globe ms-1 text-white-50"></i>
-            </span>
-          ))}
-          {countriesList.map((country, index) => (
-            <span key={`dup-${index}`} className="mx-3 text-warning fw-semibold">
-              {country} <i className="fas fa-globe ms-1 text-white-50"></i>
-            </span>
-          ))}
+            {countriesList.map((country, index) => (
+              <span key={`dup-${index}`} className="mx-3 text-warning fw-semibold">
+                {country} <i className="fas fa-globe ms-1 text-white-50"></i>
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
-      <style jsx>{`
+      {/* Coffee Session Modal */}
+      {showCoffeeModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowCoffeeModal(false)}>
+          <div style={{ background: 'rgba(20,25,45,0.95)', borderRadius: '2rem', padding: '2rem', maxWidth: '500px', width: '90%', border: '1px solid #ffd700' }} onClick={e => e.stopPropagation()}>
+            <i className="fas fa-coffee fa-3x text-warning mb-3"></i>
+            <h3 style={{ color: '#ffd700' }}>Schedule Your Success Coffee Session</h3>
+            <p style={{ color: '#ccc' }}>Let's discuss your goals and create a roadmap to financial freedom.</p>
+            <input type="email" placeholder="Your email address" className="form-control mb-3" style={{ background: '#2a2a3e', border: '1px solid #ffd700', color: 'white' }} />
+            <button className="btn btn-warning w-100" onClick={() => setShowCoffeeModal(false)}>Book Session →</button>
+            <button className="btn btn-link text-white-50 mt-2 w-100" onClick={() => setShowCoffeeModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Webinar Modal */}
+      {showWebinarModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowWebinarModal(false)}>
+          <div style={{ background: 'rgba(20,25,45,0.95)', borderRadius: '2rem', padding: '2rem', maxWidth: '500px', width: '90%', border: '1px solid #ff6b4a' }} onClick={e => e.stopPropagation()}>
+            <i className="fas fa-video fa-3x" style={{ color: '#ff6b4a' }}></i>
+            <h3 style={{ color: '#ff6b4a' }}>Wealth Renaissance Webinar</h3>
+            <p style={{ color: '#ccc' }}>Limited slots available! Learn the exact systems to build wealth through network marketing.</p>
+            <input type="email" placeholder="Your email address" className="form-control mb-3" style={{ background: '#2a2a3e', border: '1px solid #ff6b4a', color: 'white' }} />
+            <button className="btn w-100" style={{ background: '#ff6b4a', color: 'white' }} onClick={() => setShowWebinarModal(false)}>Reserve My Spot →</button>
+            <button className="btn btn-link text-white-50 mt-2 w-100" onClick={() => setShowWebinarModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
@@ -504,7 +610,7 @@ const HomeComponent = () => {
           width: 80px;
           height: 4px;
           background: linear-gradient(90deg, #D4AF37, #B8860B);
-          border-radius: 2px;
+          borderRadius: 2px;
           margin: 20px auto;
         }
         
@@ -557,13 +663,16 @@ const HomeComponent = () => {
           background-color: #D4AF37;
         }
         
+        .thumbnail-card {
+          transition: all 0.3s ease;
+        }
+        
         .w-8 { width: 2rem; }
         .h-12 { height: 3rem; }
         .w-1-5 { width: 0.375rem; }
         .h-3 { height: 0.75rem; }
         .backdrop-blur-sm { backdrop-filter: blur(4px); }
         .tracking-wide { letter-spacing: 0.025em; }
-        .thumbnail-card { transition: all 0.3s ease; }
         
         @media (max-width: 768px) {
           .image-carousel .carousel-item div { height: 350px !important; }
@@ -574,6 +683,5 @@ const HomeComponent = () => {
     </>
   );
 };
-
 
 export default HomeComponent;

@@ -115,7 +115,7 @@ const AboutUs = () => {
               </div>
               <h3 className="fw-bold mb-3">Our Mission</h3>
               <p className="text-muted">
-                To impact <strong className="golden-text">1,000,000 lives positively</strong> through our systems by 2025
+                To impact <strong className="golden-text">1,000,000 lives positively</strong> through our systems by 2030
               </p>
             </div>
           </Col>
@@ -196,8 +196,8 @@ const AboutUs = () => {
                 </Col>
                 <Col md={4}>
                   <div className="p-2">
-                    <h5 className="text-warning fw-bold">2024</h5>
-                    <p className="small text-muted mb-0">1 Million Lives Impacted</p>
+                    <h5 className="text-warning fw-bold">2030</h5>
+                    <p className="small text-muted mb-0">To 1 Million Lives Impacted</p>
                   </div>
                 </Col>
               </Row>
