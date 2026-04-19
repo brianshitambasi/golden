@@ -55,7 +55,7 @@ const NavBar = () => {
       }}
     >
       <Container fluid="lg">
-        {/* Logo */}
+        {/* Logo - GOLDEN DREAMERS Branding */}
         <BootstrapNavbar.Brand 
           as={Link}
           to="/"
@@ -77,7 +77,7 @@ const NavBar = () => {
           </div>
         </BootstrapNavbar.Brand>
 
-        {/* Mobile Toggle Button - Made visible */}
+        {/* Mobile Toggle Button */}
         <div className="d-lg-none">
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -141,7 +141,7 @@ const NavBar = () => {
               );
             })}
 
-            {/* Mobile Dropdown - With Visible Icons */}
+            {/* Mobile Dropdown */}
             <div className="nav-dropdown-wrapper w-100 d-lg-none">
               <div 
                 className="dropdown-mobile-header" 
@@ -354,7 +354,7 @@ const NavBar = () => {
             </Nav.Link>
           </Nav>
 
-          {/* Join Now Button */}
+          {/* Join Now Button - Golden Dreamers Style */}
           <Button
             as={Link}
             to="/packages"
@@ -379,8 +379,8 @@ const NavBar = () => {
               e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.3)';
             }}
           >
-            <i className="fas fa-user-plus me-2"></i>
-            Join Now
+            <i className="fas fa-gem me-2"></i>
+            Join Golden Dreamers
           </Button>
         </BootstrapNavbar.Collapse>
       </Container>

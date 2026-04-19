@@ -22,12 +22,12 @@ const ContactSupport = () => {
       color: '#D4AF37'
     },
     {
-      name: 'MR. ERIC KIMATHI',
+      name: 'MR. AUSTINE ORINA',
       title: 'Senior Support Manager',
-      phone: '+254 706 065978',
-      phoneShort: '0706 065978',
-      email: 'eric.kimathi@goldendreamers.com',
-      image: '/images/static/IMG-20260406-WA0334.jpg',
+      phone: '+254 746 332 642',
+      phoneShort: '0746 332 642',
+      email: 'austine.orina@goldendreamers.com',
+      image: '/images/static/IMG-20260406-WA0410.jpg',
       color: '#4A90E2'
     },
     {
