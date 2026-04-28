@@ -322,7 +322,7 @@ const PackagesSection = () => {
               React.createElement('h3', { className: 'fw-bold mb-2' }, 'OUR MISSION'),
               React.createElement('p', { className: 'fs-5 text-dark mb-0' },
                 'TO IMPACT ', React.createElement('strong', { className: 'golden-text' }, '1,000,000 LIVES'), 
-                ' POSITIVELY THROUGH OUR SYSTEMS BY 2025.'
+                ' POSITIVELY THROUGH OUR SYSTEMS BY 2030.'
               )
             )
           )

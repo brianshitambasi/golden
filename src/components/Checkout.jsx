@@ -22,7 +22,7 @@ export default function Checkout() {
   const subtotal = cart.totalAmount;
   const total = subtotal + deliveryFee;
 
-  // Real STK Push – calls your backend
+  // Real STK Push – calls your backend (now using sandbox shortcode 174379)
   const initiateSTKPush = async () => {
     if (!phoneNumber || phoneNumber.length < 10) {
       alert('Please enter a valid phone number (e.g., 0712345678)');
@@ -96,9 +96,16 @@ export default function Checkout() {
   };
 
   const handleCheckout = () => setShowPhonePrompt(true);
-  const formatPhone = (num) => num ? (num.startsWith('0') ? '254' + num.slice(1) : '254' + num) : '';
+  const formatPhone = (num) => {
+    if (!num) return '';
+    let cleaned = num.toString().replace(/\s/g, '');
+    if (cleaned.startsWith('0')) return '254' + cleaned.slice(1);
+    if (cleaned.startsWith('7')) return '254' + cleaned;
+    if (cleaned.startsWith('254')) return cleaned; // already has prefix
+    return cleaned;
+  };
 
-  // ----- Kilimall‑style My Orders sidebar -----
+  // ----- Kilimall‑style My Orders sidebar (unchanged) -----
   const MyOrders = () => (
     <div className="bg-white rounded-4 shadow-sm p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -161,7 +168,7 @@ export default function Checkout() {
     </div>
   );
 
-  // ----- Checkout content (M‑Pesa) -----
+  // ----- Checkout content (M‑Pesa) – updated for sandbox display -----
   const CheckoutContent = () => (
     <>
       {/* Order Summary Card */}
@@ -197,11 +204,11 @@ export default function Checkout() {
         <div className="border rounded-3 p-3 mb-3">
           <div className="d-flex align-items-center mb-2">
             <i className="fas fa-mobile-alt fa-2x text-success me-2"></i>
-            <span className="fw-semibold">M-Pesa STK Push</span>
-            <span className="badge bg-success ms-2">Live</span>
+            <span className="fw-semibold">M-Pesa STK Push (Sandbox)</span>
+            <span className="badge bg-info ms-2">Test Mode</span>
           </div>
           <p className="small text-muted mb-0">
-            Money will be sent to <strong>Business Number 0116378188</strong>
+            Money will be sent to <strong>Test Shortcode 174379</strong> – no real charges
           </p>
         </div>
 
@@ -216,7 +223,7 @@ export default function Checkout() {
           <div className="mt-3">
             <label className="form-label fw-semibold">
               <i className="fas fa-phone-alt text-success me-2"></i>
-              M-Pesa Phone Number
+              M-Pesa Phone Number (Test: 254708374149)
             </label>
             <input
               type="tel"
@@ -227,14 +234,14 @@ export default function Checkout() {
             />
             <p className="small text-muted mb-2">
               <i className="fas fa-info-circle me-1"></i>
-              Payment will be charged to your M-Pesa account
+              Sandbox mode – use test number <strong>254708374149</strong> and PIN <strong>123456</strong> (via simulator)
             </p>
             <button className="btn btn-success w-100 py-2 fw-bold rounded-3" onClick={initiateSTKPush}>
               <i className="fas fa-paper-plane me-2"></i>
               Request STK Push
             </button>
             <small className="text-muted d-block text-center mt-2">
-              You will receive a prompt on {formatPhone(phoneNumber) || 'your phone'}
+              You will receive a prompt on {formatPhone(phoneNumber) || 'your phone'} (simulated)
             </small>
           </div>
         )}
@@ -244,8 +251,7 @@ export default function Checkout() {
             <div className="spinner-border text-warning mb-3" role="status"></div>
             <h6>STK Push Sent!</h6>
             <p className="text-muted small">
-              Check your phone ({formatPhone(phoneNumber)})<br />
-              Enter your M-Pesa PIN to complete payment
+              Check the <strong>Daraja Simulator</strong> for test payment
             </p>
           </div>
         )}
@@ -269,16 +275,13 @@ export default function Checkout() {
     </>
   );
 
-  // ----- Main layout (two columns, My Orders on left) -----
+  // ----- Main layout (same as before) -----
   return (
     <div className="container py-4">
       <div className="row g-4">
-        {/* Left column – My Orders */}
         <div className="col-lg-4">
           <MyOrders />
         </div>
-
-        {/* Right column – Checkout */}
         <div className="col-lg-8">
           <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
             <h4 className="fw-bold mb-0">
@@ -286,8 +289,6 @@ export default function Checkout() {
             </h4>
             <p className="text-muted small mb-0">Complete your purchase securely</p>
           </div>
-
-          {/* Tab navigation */}
           <div className="bg-white rounded-4 shadow-sm mb-4">
             <div className="d-flex border-bottom">
               <button
@@ -304,8 +305,6 @@ export default function Checkout() {
               </button>
             </div>
           </div>
-
-          {/* Tab content */}
           {activeTab === 'checkout' && <CheckoutContent />}
           {activeTab === 'orders' && (
             <div className="bg-white rounded-4 shadow-sm p-4 text-center py-5">
@@ -318,8 +317,6 @@ export default function Checkout() {
           )}
         </div>
       </div>
-
-      {/* Golden styles */}
       <style>{`
         .golden-text {
           background: linear-gradient(135deg, #D4AF37, #B8860B);
