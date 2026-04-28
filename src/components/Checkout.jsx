@@ -1,5 +1,5 @@
 // src/components/Checkout.jsx
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
@@ -11,17 +11,28 @@ export default function Checkout() {
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [activeTab, setActiveTab] = useState('checkout');
+  const phoneInputRef = useRef(null);
 
-  if (cart.items.length === 0 && !processing && activeTab === 'checkout') {
-    navigate('/products');
-    return null;
-  }
+  // All hooks must be called before any conditional returns
+  useEffect(() => {
+    if (showPhonePrompt && phoneInputRef.current) {
+      phoneInputRef.current.focus();
+    }
+  }, [showPhonePrompt]);
 
   const deliveryFee = 250;
   const subtotal = cart.totalAmount;
   const total = subtotal + deliveryFee;
 
-  const initiateSTKPush = async () => {
+  const handlePhoneChange = useCallback((e) => {
+    setPhoneNumber(e.target.value);
+  }, []);
+
+  const handleCheckout = useCallback(() => {
+    setShowPhonePrompt(true);
+  }, []);
+
+  const initiateSTKPush = useCallback(async () => {
     if (!phoneNumber || phoneNumber.length < 10) {
       alert('Please enter a valid phone number (e.g., 0712345678)');
       return;
@@ -85,10 +96,15 @@ export default function Checkout() {
       setShowPhonePrompt(true);
       alert('Cannot connect to payment server.');
     }
-  };
+  }, [phoneNumber, total, cart.items.length, clearCart, navigate]);
 
-  const handleCheckout = () => setShowPhonePrompt(true);
+  // Conditional redirect AFTER all hooks
+  if (cart.items.length === 0 && !processing && activeTab === 'checkout') {
+    navigate('/products');
+    return null;
+  }
 
+  // ----- MyOrders component (plain function, not a hook) -----
   const MyOrders = () => (
     <div className="bg-white rounded-4 shadow-sm p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -164,16 +180,25 @@ export default function Checkout() {
 
         {showPhonePrompt && !processing && (
           <div className="mt-3">
-            <label className="form-label fw-semibold"><i className="fas fa-phone-alt text-success me-2"></i>M-Pesa Phone Number</label>
+            <label className="form-label fw-semibold">
+              <i className="fas fa-phone-alt text-success me-2"></i>
+              M-Pesa Phone Number
+            </label>
             <input
+              ref={phoneInputRef}
               type="tel"
               className="form-control form-control-lg rounded-3 mb-3"
               placeholder="0712345678"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              style={{ pointerEvents: 'auto', userSelect: 'text', backgroundColor: '#fff' }}
+              onChange={handlePhoneChange}
+              style={{
+                pointerEvents: 'auto',
+                userSelect: 'text',
+                backgroundColor: '#fff',
+                display: 'block',
+                width: '100%'
+              }}
               autoComplete="off"
-              disabled={false}
             />
             <p className="small text-muted mb-2">
               <strong>Sandbox Test Details:</strong><br />
@@ -216,19 +241,34 @@ export default function Checkout() {
     </>
   );
 
+  // Main render
   return (
     <div className="container py-4">
       <div className="row g-4">
-        <div className="col-lg-4"><MyOrders /></div>
+        <div className="col-lg-4">
+          <MyOrders />
+        </div>
         <div className="col-lg-8">
           <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
-            <h4 className="fw-bold mb-0"><span className="golden-text">GOLDEN DREAMERS</span></h4>
+            <h4 className="fw-bold mb-0">
+              <span className="golden-text">GOLDEN DREAMERS</span>
+            </h4>
             <p className="text-muted small mb-0">Complete your purchase securely (Sandbox Test)</p>
           </div>
           <div className="bg-white rounded-4 shadow-sm mb-4">
             <div className="d-flex border-bottom">
-              <button className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'checkout' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`} onClick={() => setActiveTab('checkout')}>Checkout</button>
-              <button className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'orders' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`} onClick={() => setActiveTab('orders')}>My Orders</button>
+              <button
+                className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'checkout' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`}
+                onClick={() => setActiveTab('checkout')}
+              >
+                Checkout
+              </button>
+              <button
+                className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'orders' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`}
+                onClick={() => setActiveTab('orders')}
+              >
+                My Orders
+              </button>
             </div>
           </div>
           {activeTab === 'checkout' && <CheckoutContent />}
@@ -236,14 +276,28 @@ export default function Checkout() {
             <div className="bg-white rounded-4 shadow-sm p-4 text-center py-5">
               <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
               <p className="text-muted">No orders yet</p>
-              <button className="btn btn-warning rounded-pill px-4" onClick={() => navigate('/products')}>Start Shopping</button>
+              <button className="btn btn-warning rounded-pill px-4" onClick={() => navigate('/products')}>
+                Start Shopping
+              </button>
             </div>
           )}
         </div>
       </div>
       <style>{`
-        .golden-text { background: linear-gradient(135deg, #D4AF37, #B8860B); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+        .golden-text {
+          background: linear-gradient(135deg, #D4AF37, #B8860B);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+        .btn-warning:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+        input {
+          pointer-events: auto !important;
+          user-select: text !important;
+        }
       `}</style>
     </div>
   );
