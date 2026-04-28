@@ -223,6 +223,7 @@ export default function Checkout() {
               placeholder="0712345678"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              style={{ pointerEvents: 'auto', userSelect: 'text' }}
             />
             <p className="small text-muted mb-2">
               <i className="fas fa-info-circle me-1"></i>
