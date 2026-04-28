@@ -1,7 +1,43 @@
 // src/components/Checkout.jsx
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+
+// ✅ Separate memoized component for the phone input to prevent re-renders
+const PhoneInput = memo(({ value, onChange }) => {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  return (
+    <div className="mt-3">
+      <label className="form-label fw-semibold">
+        <i className="fas fa-phone-alt text-success me-2"></i>
+        M-Pesa Phone Number
+      </label>
+      <input
+        ref={inputRef}
+        type="tel"
+        className="form-control form-control-lg rounded-3 mb-3"
+        placeholder="0712345678"
+        value={value}
+        onChange={onChange}
+        style={{
+          pointerEvents: 'auto',
+          userSelect: 'text',
+          backgroundColor: '#fff',
+          display: 'block',
+          width: '100%'
+        }}
+        autoComplete="off"
+      />
+    </div>
+  );
+});
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
@@ -11,19 +47,12 @@ export default function Checkout() {
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [activeTab, setActiveTab] = useState('checkout');
-  const phoneInputRef = useRef(null);
-
-  // All hooks must be called before any conditional returns
-  useEffect(() => {
-    if (showPhonePrompt && phoneInputRef.current) {
-      phoneInputRef.current.focus();
-    }
-  }, [showPhonePrompt]);
 
   const deliveryFee = 250;
   const subtotal = cart.totalAmount;
   const total = subtotal + deliveryFee;
 
+  // Stable handlers
   const handlePhoneChange = useCallback((e) => {
     setPhoneNumber(e.target.value);
   }, []);
@@ -98,13 +127,12 @@ export default function Checkout() {
     }
   }, [phoneNumber, total, cart.items.length, clearCart, navigate]);
 
-  // Conditional redirect AFTER all hooks
+  // Redirect after all hooks
   if (cart.items.length === 0 && !processing && activeTab === 'checkout') {
     navigate('/products');
     return null;
   }
 
-  // ----- MyOrders component (plain function, not a hook) -----
   const MyOrders = () => (
     <div className="bg-white rounded-4 shadow-sm p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -179,27 +207,8 @@ export default function Checkout() {
         )}
 
         {showPhonePrompt && !processing && (
-          <div className="mt-3">
-            <label className="form-label fw-semibold">
-              <i className="fas fa-phone-alt text-success me-2"></i>
-              M-Pesa Phone Number
-            </label>
-            <input
-              ref={phoneInputRef}
-              type="tel"
-              className="form-control form-control-lg rounded-3 mb-3"
-              placeholder="0712345678"
-              value={phoneNumber}
-              onChange={handlePhoneChange}
-              style={{
-                pointerEvents: 'auto',
-                userSelect: 'text',
-                backgroundColor: '#fff',
-                display: 'block',
-                width: '100%'
-              }}
-              autoComplete="off"
-            />
+          <>
+            <PhoneInput value={phoneNumber} onChange={handlePhoneChange} />
             <p className="small text-muted mb-2">
               <strong>Sandbox Test Details:</strong><br />
               Phone: <strong>254708374149</strong> (use this number for testing)<br />
@@ -208,7 +217,7 @@ export default function Checkout() {
             <button className="btn btn-success w-100 py-2 fw-bold rounded-3" onClick={initiateSTKPush}>
               Request STK Push
             </button>
-          </div>
+          </>
         )}
 
         {processing && paymentStatus === 'pending' && (
@@ -241,34 +250,19 @@ export default function Checkout() {
     </>
   );
 
-  // Main render
   return (
     <div className="container py-4">
       <div className="row g-4">
-        <div className="col-lg-4">
-          <MyOrders />
-        </div>
+        <div className="col-lg-4"><MyOrders /></div>
         <div className="col-lg-8">
           <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
-            <h4 className="fw-bold mb-0">
-              <span className="golden-text">GOLDEN DREAMERS</span>
-            </h4>
+            <h4 className="fw-bold mb-0"><span className="golden-text">GOLDEN DREAMERS</span></h4>
             <p className="text-muted small mb-0">Complete your purchase securely (Sandbox Test)</p>
           </div>
           <div className="bg-white rounded-4 shadow-sm mb-4">
             <div className="d-flex border-bottom">
-              <button
-                className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'checkout' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`}
-                onClick={() => setActiveTab('checkout')}
-              >
-                Checkout
-              </button>
-              <button
-                className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'orders' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`}
-                onClick={() => setActiveTab('orders')}
-              >
-                My Orders
-              </button>
+              <button className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'checkout' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`} onClick={() => setActiveTab('checkout')}>Checkout</button>
+              <button className={`btn fw-semibold py-3 px-4 rounded-0 ${activeTab === 'orders' ? 'text-warning border-bottom border-warning border-2' : 'text-muted'}`} onClick={() => setActiveTab('orders')}>My Orders</button>
             </div>
           </div>
           {activeTab === 'checkout' && <CheckoutContent />}
@@ -276,28 +270,15 @@ export default function Checkout() {
             <div className="bg-white rounded-4 shadow-sm p-4 text-center py-5">
               <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
               <p className="text-muted">No orders yet</p>
-              <button className="btn btn-warning rounded-pill px-4" onClick={() => navigate('/products')}>
-                Start Shopping
-              </button>
+              <button className="btn btn-warning rounded-pill px-4" onClick={() => navigate('/products')}>Start Shopping</button>
             </div>
           )}
         </div>
       </div>
       <style>{`
-        .golden-text {
-          background: linear-gradient(135deg, #D4AF37, #B8860B);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .btn-warning:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-        input {
-          pointer-events: auto !important;
-          user-select: text !important;
-        }
+        .golden-text { background: linear-gradient(135deg, #D4AF37, #B8860B); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+        input { pointer-events: auto !important; user-select: text !important; }
       `}</style>
     </div>
   );
