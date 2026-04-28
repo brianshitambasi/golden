@@ -195,9 +195,9 @@ export default function Checkout() {
           <div className="d-flex align-items-center mb-2">
             <i className="fas fa-mobile-alt fa-2x text-success me-2"></i>
             <span className="fw-semibold">M-Pesa STK Push (Sandbox)</span>
-            <span className="badge bg-info ms-2">Test Mode</span>
+            <span className="badge bg-info ms-2"></span>
           </div>
-          <p className="small text-muted mb-0">Money will be sent to <strong>Test Shortcode 174379</strong> – no real charges</p>
+          <p className="small text-muted mb-0">Money will be sent to  <strong> 174379</strong> –</p>
         </div>
 
         {!showPhonePrompt && !processing && !paymentStatus && (
